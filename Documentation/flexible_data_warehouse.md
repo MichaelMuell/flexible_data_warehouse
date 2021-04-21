@@ -3,9 +3,23 @@
 
 <!-- code_chunk_output -->
 
-- [Why do we need it?](#why-do-we-need-it)
-- [How does it work ?](#how-does-it-work)
-- [How Does the Technical Solution Work?](#how-does-the-technical-solution-work)
+![fNNhSC4UET](/assets/fNNhSC4UET_qaau08fxx.png)
+
+- [Introduction & Remarks](#introduction-remarks)
+- [The Framework for Business Process Improvement](#the-framework-for-business-process-improvement)
+  - [The dashboard that shows just numbers misses the point.](#the-dashboard-that-shows-just-numbers-misses-the-point)
+  - [The main job of the middle manager is process optimization.](#the-main-job-of-the-middle-manager-is-process-optimization)
+  - [IDENTIFY / Is There a Problem?](#identify-is-there-a-problem)
+  - [ANALYZE / What Caused the Problem?](#analyze-what-caused-the-problem)
+  - [ACT / Which Actions Should We Take?](#act-which-actions-should-we-take)
+  - [CHECK / Were the actions successful?](#check-were-the-actions-successful)
+  - [How to improve even more!](#how-to-improve-even-more)
+- [Designing an IT system to optimally support Business Process Improvement](#designing-an-it-system-to-optimally-support-business-process-improvement)
+  - [Current System Landscape](#current-system-landscape)
+  - [Differences between Core KPI Layer and Flexible KPI Layer](#differences-between-core-kpi-layer-and-flexible-kpi-layer)
+  - [Different Needs for a flexible Data Warehouse](#different-needs-for-a-flexible-data-warehouse)
+  - [Implementation Principles to fulfill them](#implementation-principles-to-fulfill-them)
+- [Implementation of the flexible data Warehouse](#implementation-of-the-flexible-data-warehouse)
   - [Systems](#systems)
     - [Data Factory](#data-factory)
     - [SQL Server](#sql-server)
@@ -89,30 +103,128 @@
 <!-- /code_chunk_output -->
 
 
+# Introduction & Remarks
 
-#Why do we need it? 
+#The Framework for Business Process Improvement
 
-Article Published in Towards DataScience Magazine
+## The dashboard that shows just numbers misses the point.
 
-https://towardsdatascience.com/how-to-really-improve-your-business-processes-with-dashboards-737941090228
+The first thought that comes to mind when thinking about Self Service BI is a beautiful dashboard that shows the critical business numbers while giving you an excellent overview of everything you need to know and how those numbers perform over a given time frame.
 
-![](2021-04-09-11-13-30.png)
+How could this not be helpful?
 
-![](2021-04-09-11-14-12.png)
+Well, let’s think about what the average middle manager that will use the tool later needs.
 
-#How does it work ? 
+You might ask why only middle managers would use these tools. The simple answer is that if you had to prepare a C-level dashboard, it would be too big to consume.
+
+It’s the Controller’s job to take and prepare presentations that point out the critical numbers on a given moment and prepare presentations that highlight their specific relevance. Designing an automated Dashboard fails as the story that the data needs to tell can vary significantly in a given circumstance.
+
+In contrast, it seems useful that a Controller uses BI tools to make sense of the data before preparing a C-level presentation. With augmented analytics, a machine might do this prioritization of abnormal data in the future. However, the future is not now. At least not in your average industrial company.
+
+Actually, the topic is quite big and deserves a separate post. For this article’s sake, let’s agree that the middle manager is the main target for Self Service BI tools.
+##The main job of the middle manager is process optimization.
+Process optimization is a multi-step process. Depending on your source, the number of steps and their names might vary. Generally speaking, it’s the following:
+
+1. Identify that there is a problem
+2. Analyze the root-cause
+3. Define actions and execute them
+4. Check if the actions were successful
+
+
+
+image 1–1 by the author
+
+The managers’ success is measured mainly by this task. That is correct in most cases as he is usually receiving a bonus based on how well the KPIs under his responsibility perform over a given period. Our goal is to design an information system to support him with this task. The best way to do that is to help him answer the main questions related to each step based on the data we have:
+
+- Is there a problem?
+- What caused the problem?
+- Which actions should we take?
+- Were the actions successful?
+
+From looking at the questions above, you can already tell that the dashboard described at the beginning of this article only helps answer the first question. Most of the value that an automated analytics solution could have is left out.
+
+Let’s have a look at how a more sophisticated solution could answer these questions. I took the screenshots from one of the actual dashboards we implemented at my company. To make it readable at this page layout, I included only the essential parts (lego bricks) of each dashboard part to get the point across. The numbers are anonymized.
+
+##IDENTIFY / Is There a Problem?
+
+image 2–1 by the author
+
+In this screenshot, you can see the classic dashboard that usually gets printed on marketing materials. The actual numbers of last period’s KPI were placed on top. Below you can see the trend over the previous months. If the KPI crosses a certain threshold, it turns green/red to indicate whether the result got better or worse than last month. For each KPI, you can jump to the root cause analysis by double-clicking.
+
+##ANALYZE / What Caused the Problem?
+The main idea is that a bad result is, in most cases, not caused by the average. Most of the time, outliers drag down the overall result. Consequently, showing a top-level KPI without quickly allowing for root cause analysis leads to ineffective actions as the vast majority of dimension members is not a problem. Problems often cluster around a particular attribute of a dimension that all members have in common.
+
+For example, Suppliers based in Hong Kong perform worse than suppliers from other countries. It’s easy to then drill down into suppliers from Hong Kong.
+
+image 3–1 by the author
+
+By spreading out the KPI along critical dimensions and attributes, the manager can quickly narrow down the possible causes.
+
+##ACT / Which Actions Should We Take?
+As the time available to the team for making improvements is limited, it’s essential to prioritize effective actions. To find the most effective actions, we need to first think about which actions the manager can take and which dimensions will be influenced. Most of the time, it turns out to be not that many, so it’s even more important to know them. Examples might be his direct reports, specific system settings, and vendors or customers.
+
+In the analysis section, we already discussed the importance of outliers. Outliers are exponentially more beneficial to work on as the same action is usually required to improve both an outlier and an average member, while the potential increase of the overall KPI is much greater with the outlier.
+
+image 4–1 by the author
+
+The graph above shows the top customers that had the worst impact on the KPI over the last period. Most of the time, we can calculate this by the overall KPI of the customer times the transaction/activity frequency. E.g., A frequent customer performing bad will drag down the overall KPI more than a one time customer.
+
+When we compare this potential for improvement for each customer, we can see that customer 352581 has much more potential than customer 272873. Assuming the same amount of work is required to improve each customer, it’s a much better choice to work on customer 352581.
+
+This shows that the impact we can have with our actions is more determined by which customers we chose in the first place than how well we carry out the activities.
+
+Assuming we have time to work on the top 3 customers each month, we can now simulate the overall KPI outcome. You can see the second green bar on the leading three suppliers in image 4–1. Improving these customers with 90% confidence would result in below improvement on the overall KPI.
+
+image 4–2 by the author
+
+image 4–3 by the author
+
+Confidentiality and customer choice can be adjusted without additional effort, which allows the manager to simulate possible actions, formulate the best measures, and set a realistic target for the next period.
+
+Including the managers’ expert business knowledge in this step is essential as specific customers will have more or less business in the future, or some customers might be harder to handle than others.
+##CHECK / Were the actions successful?
+
+image 4–4 by the author
+
+Setting a goal to achieve for each period helps the manager understand if the defined actions were successful. It’s a step often overlooked but extremely important because it shows the improvement over time and, therefore, the team’s work.
+
+In a real-world scenario, the chart never increases steadily but looks more like the stock market’s ups and downs. As with the stock market, if the trend goes up, the actions are successful. If decreases can be explained (e.g., CoVid19), everything is fine.
+
+image 5–1 by the author
+The chart shows the target SET for each month compared to the actual figures.
+
+image 6–1 by the author
+You can think of the improvement process as a circle that continually iterates, moving upwards in the best case.
+
+Similarly, the dashboard's value can be judged by the value difference between the introduction and the current period over time.
+
+However, it’s essential to understand that the actions taken and not the dashboard itself are responsible for the improvement.
+
+##How to improve even more!
+As there is no perfect solution, there is one feature missing I would hope SAP would implement in the future:
+All actions coming from the insights must be captured and followed up outside the tool. I would love to see integrated task management or direct integration to a tool like Trello that helps create and follow up on tasks derived from insights.
+
+#Designing an IT system to optimally support Business Process Improvement
+
+## Current System Landscape
+
+## Differences between Core KPI Layer and Flexible KPI Layer
+
+## Different Needs for a flexible Data Warehouse
+
+## Implementation Principles to fulfill them
 
 ![](2021-04-09-11-14-55.png)
 
 ![](2021-04-09-11-15-21.png)
 
-#How Does the Technical Solution Work? 
+#Implementation of the flexible data Warehouse
 
 ##Systems
 
 ###Data Factory
 
-D-System: 
+D-System:
 https://adf.azure.com/en-us/authoring/dataflow/O2C_INGEST_ACCOUNTS_RECEIVEABLES?factory=%2Fsubscriptions%2F770faa00-73c9-4505-be0e-9fd399518c7f%2FresourceGroups%2Fsdp-s-fssc%2Fproviders%2FMicrosoft.DataFactory%2Ffactories%2Fsdp-s-d-fssc-df
 
 P-System
@@ -198,7 +310,7 @@ v-dp-tasks
 
 #Data Factory
 
-##Datasets 
+##Datasets
 
 ![](2021-04-09-11-17-19.png)
 
@@ -221,13 +333,13 @@ v-dp-tasks
 |DS_P2P_SQL_SERVER   | All Tables on SQL Server WAVEI  |
 |DS_O2C_SQL_Server |All Tables on SQL Server WAVEII
 
-**Output** 
+**Output**
 
 |Dataset   |Content   |
 |---|---|
 | DS_CSV  |  Output all Files as CSV (Output as Excel not supported)  |
 
-##Dataflows 
+##Dataflows
 
 ![](2021-04-09-11-21-34.png)
 
@@ -236,25 +348,25 @@ v-dp-tasks
 |P2P_INGEST_DATA_ACCOUNTS_PAYABLES|Ingest of Accounts Payables data to SQL Server
 |P2P_INGEST_DATA_PAYMENTS |Ingest of Payments data to SQL Server
 |P2P_INGEST_DATA_GENERAL| Ingest of all general data/master Data to SQL Server
-|O2C_INGEST_ACCOUNTS_RECEIVEABLES|Ingest of Accounts Receiveables  data to SQL Server| 
-O2C_INGEST_DATA_EFLOW| Ingest of EFLOW and BW data to SQL server 
+|O2C_INGEST_ACCOUNTS_RECEIVEABLES|Ingest of Accounts Receiveables  data to SQL Server|
+O2C_INGEST_DATA_EFLOW| Ingest of EFLOW and BW data to SQL server
 |O2C_INGEST_DATA_GENERAL|Ingest of general data to SQL Server
 
 >>Note: In general all of these flows could be combined into one for each o2c and p2p. However it's easier for debugging and in the future the parts might have to run separately due to different business requirements by each department.
 
-###General Data Flow logic 
+###General Data Flow logic
 
 
 **1. Import data from Datasource for a specific table**
 
 ![](2021-04-09-11-33-30.png)
 
->a. set correct wildcard filepath to find corresponding table on datalake 
+>a. set correct wildcard filepath to find corresponding table on datalake
 >b. store filepath in column to enable check in SQL server later  
 
 **2. Select relevant columns from table and rename them into names that make sense**
 ![](2021-04-09-11-35-05.png)
->Do this step as early as possible to work with 'real names'. Use these consistently 
+>Do this step as early as possible to work with 'real names'. Use these consistently
 
 **3. Filter relevant Data**
 
@@ -284,7 +396,7 @@ Use recreate table to delete and recreate the target tables with each load. Avoi
 ![](2021-04-09-11-50-13.png)
 
 
-##Pipelines 
+##Pipelines
 
 ![](2021-04-09-11-51-21.png)
 
@@ -300,14 +412,14 @@ Use recreate table to delete and recreate the target tables with each load. Avoi
 |PIP_P2P_OUTPUT|Output all P2P data onto SAC Fileserver
 |PIP_P2P_OUTPUT_SCHEMA|Prints first 500 rows of each P2P model to SAC server. Used to speed up model updates in SAC. **Not used in weekly run**
 
-The Pipelines are structured in 3 parts: 
-1. Ingest from data lake 
-2. Transformation on the SQL Server 
-3. Output to SAC Fileserver 
+The Pipelines are structured in 3 parts:
+1. Ingest from data lake
+2. Transformation on the SQL Server
+3. Output to SAC Fileserver
 
-### Ingest Pipelines 
+### Ingest Pipelines
 
-Both Ingest Piepelines work in the same way: 
+Both Ingest Piepelines work in the same way:
 
 ![](2021-04-09-11-57-43.png)
 
@@ -315,21 +427,21 @@ Both Ingest Piepelines work in the same way:
 
 ![](2021-04-09-11-58-45.png)
 
-a. Parameters from Dataflows must be entered here. In our case it's the SQL Server table names 
+a. Parameters from Dataflows must be entered here. In our case it's the SQL Server table names
 
->For each dataflow we can variably select the "Run On". If there is a lot of data we can use more CPUs to speed up the processing. This is more expensive though. 
+>For each dataflow we can variably select the "Run On". If there is a lot of data we can use more CPUs to speed up the processing. This is more expensive though.
 
 **2. Copy Data from BW Cubes**
 ![](2021-04-09-12-02-46.png)
 
-In copy data step you can directly query SQL statements against the denodo baseview of the query. There is now delay in getting the data from BW. 
+In copy data step you can directly query SQL statements against the denodo baseview of the query. There is now delay in getting the data from BW.
 
-> You can easily use dynamic parameters in this select statement. 
+> You can easily use dynamic parameters in this select statement.
 
-```SQL 
+```SQL
 SELECT *
 FROM connection_layer_ucd.bv_sapbw_bp1_fssc_framework_improvment_fi1000
-WHERE monthyearfrompostingdatedefaultfromexitme_0  = '@{getPastTime(1,'Month','MM.yyyy')}' AND 
+WHERE monthyearfrompostingdatedefaultfromexitme_0  = '@{getPastTime(1,'Month','MM.yyyy')}' AND
 (
 companycode_key_0 = 'EP1_100/0083' OR
 companycode_key_0 = 'EP1_100/0189' OR
@@ -345,33 +457,33 @@ companycode_key_0 = 'EP1_100/0078'
 )
 ```
 
-**3. Copy external Excel files** 
+**3. Copy external Excel files**
 
-Excel files can be imported directly fromm the directory in the dataset. You can enter the filename in the settings as parameter. 
+Excel files can be imported directly fromm the directory in the dataset. You can enter the filename in the settings as parameter.
 
 ![](2021-04-09-13-26-01.png)
 
 
-**4. Special** 
+**4. Special**
 
-The only kind of special case is this SQL server procedure that is executed in the ingest pipeline. It's needed to pre-format the data from BW so that the dataflows can merge the data with the SAP tables. 
+The only kind of special case is this SQL server procedure that is executed in the ingest pipeline. It's needed to pre-format the data from BW so that the dataflows can merge the data with the SAP tables.
 
 ![](2021-04-09-13-28-49.png)
 
 ### Transformation Pipeline
 
-The Transformation Pipeline is used to execute the stored procedures on the SQL-Server in a procedural manner. More information will be provided in the Chapter about the SQL Server 
+The Transformation Pipeline is used to execute the stored procedures on the SQL-Server in a procedural manner. More information will be provided in the Chapter about the SQL Server
 
 ![](2021-04-09-13-31-58.png)
 
 
-### Output Pipeline 
+### Output Pipeline
 
-The output pipelines copy the data from the model tables in SQL server onto the SAC fileserver. It's possible to do another mapping here between SQL Server column name and SAC column name. 
+The output pipelines copy the data from the model tables in SQL server onto the SAC fileserver. It's possible to do another mapping here between SQL Server column name and SAC column name.
 
 ![](2021-04-09-13-35-37.png)
 
-### Output Pipeline Schema 
+### Output Pipeline Schema
 
 The model mapping function in SAC is very slow if there is a lot of data uploaded. THis pipeline only print the 500 first rows of each model into the csv file. If there needs to be a new mapping business will ask it to print only the schema to do the mapping. Afterwads the full dataset can be loaded automatically.  
 
@@ -379,16 +491,16 @@ The model mapping function in SAC is very slow if there is a lot of data uploade
 
 ![](2021-04-15-10-04-14.png)
 
-The data factory is connected to GIT version control. After changes in d-system are done they can be published via the publish button. Afterwards HQ needs to be contacted to move the changes to P-System. 
+The data factory is connected to GIT version control. After changes in d-system are done they can be published via the publish button. Afterwards HQ needs to be contacted to move the changes to P-System.
 
-#SQL Server 
+#SQL Server
 
 ##Key requirements for transformation stage:
 
-1. The pipeline has to be procedural on each step in the data factory. If one step fails the pipeline must be able to only rerun from the failed activity to avoid long runtimes 
+1. The pipeline has to be procedural on each step in the data factory. If one step fails the pipeline must be able to only rerun from the failed activity to avoid long runtimes
 --> Oil in a Pipeline also does not flow back ;-)
 
-2. Errors should be traceable as easy and fast as possible. 
+2. Errors should be traceable as easy and fast as possible.
 
 3. Make solution scalable for future demands
 
@@ -397,45 +509,45 @@ The data factory is connected to GIT version control. After changes in d-system 
 1. Each Stored procedure is only allowed to work with tables of the same name stage or lower:
 E.g. Stored procedure CLN can only work with tables CLN and ING
 TP1 only with CLN/ING/TP1 etc.
-2. Each task for each table in each step gets it’s own stored procedure with the tables name as procedure name. 
+2. Each task for each table in each step gets it’s own stored procedure with the tables name as procedure name.
 e.g. Step to clean table CLN_ADRC is called P_CLN_ADRC
 
 3. Strictly follow transformation structure for all tables
 
 
-## Naming Conventions 
+## Naming Conventions
 
-###Tables 
+###Tables
 
-1. INGESTED from Data Factory  
+1. INGESTED from Data Factory 
 Table Names ING_* for SAP&BW / INX_*  for Excel
 
->Original tables from data lake. Should never be changed to avoid having to run INGEST Pipeline again 
+>Original tables from data lake. Should never be changed to avoid having to run INGEST Pipeline again
 
-2. CLEANED  with ETL functions 
+2. CLEANED  with ETL functions
 Table Names CLN_*
 
-3. TRANSFORM1 Join Data together 
+3. TRANSFORM1 Join Data together
 Table Names TP1_*
 
-4. TRANSFORM2 Join Data together 
+4. TRANSFORM2 Join Data together
 Table Names TP2_*
 
-5. TRANSFORM3 Calculate additional Columns 
+5. TRANSFORM3 Calculate additional Columns
 Table Names TP3_*
 
-6. STAGE data for Export to Fileserver 
+6. STAGE data for Export to Fileserver
 Table Names STA_*
 
-### Stored Procedures 
+### Stored Procedures
 
-1. Stored Procedures Names *_EXEC 
-Are executed from Azure Data Factory 
+1. Stored Procedures Names *_EXEC
+Are executed from Azure Data Factory
 
 2. Stored Procedure Names P_CLN_*
 Apply all the ETL functions and data cleaning
 
-3. Stored Procedure Names P_TP1* 
+3. Stored Procedure Names P_TP1*
 Join Cleaned Tables
 
 4. Stored Procedure Names P_TP2*
@@ -447,24 +559,24 @@ Apply Business logic and calculate additional columns
 6. Stored Procedure Names P_STA*
 Create different views that can be consumed via Analytics tools.
 
-### Scalar Functions and ETL 
+### Scalar Functions and ETL
 
 ETL functions and Scalar functions are named after what they do. They only do one thing. This is especially important because SQL Server does not have a debugger
 
 
-### Schema 
+### Schema
 
-1. dbo 
+1. dbo
   Everything related to Purchase to Pay Process
 
-2. o2c 
-  Everything related to Order to Cash Process 
+2. o2c
+  Everything related to Order to Cash Process
 
 >Currently everything in schema dbo is written in upper case. Everything in o2c is written in lower case. This is legacy and should be changed in the future to all lower case. Also, all p2p tables should be moved to a new schema called p2p. Everything that's used for both like ETL functions should be kept in dbo (default schema)
 
 ### Execution from Datafactory
 
-Not all stored procedures are executed from Azure Cloud. Only the 5 main procedures are controlled via Azure Data Factory: 
+Not all stored procedures are executed from Azure Cloud. Only the 5 main procedures are controlled via Azure Data Factory:
 
 ![](2021-04-09-13-31-58.png)
 
@@ -485,7 +597,7 @@ exec o2c.p_cln_src_download_date @schema = 'dbo'
 exec p_cln_load_details
 ----------------------------------------------------------------------------
 
-exec p_cln_adrc 
+exec p_cln_adrc
 
 exec p_cln_bkpf
 
@@ -503,7 +615,7 @@ exec p_cln_payment_calendar
 
 exec p_cln_t001s
 
-exec p_cln_t024 
+exec p_cln_t024
 
 exec p_cln_vf_kred
 
@@ -522,11 +634,11 @@ exec p_cln_ts_invoices
 exec o2c.p_cln_clean_columns @schema  = 'dbo'
 ```
 
-### p_cln_first 
+### p_cln_first
 
 1. Copies all data from ING_* to CLN_*. Creates indexed tables one by one. Adds additional columns.
 
-```SQL 
+```SQL
 declare @table table
 (
 tablename varchar(50),
@@ -534,14 +646,14 @@ id int identity(1,1)
 )
 
 insert into @table
-select distinct table_name from information_schema.columns 
-where left(table_name,2) = 'in' and 
-	 table_name <> 'ing_fi5000' and 
+select distinct table_name from information_schema.columns
+where left(table_name,2) = 'in' and
+	 table_name <> 'ing_fi5000' and
 	 table_name <> 'ing_eflowtask' and
      table_schema = @schema
 
 declare @max int
-declare @sql varchar(max) 
+declare @sql varchar(max)
 declare @tablename varchar(50)
 declare @id int = 1
 
@@ -554,34 +666,34 @@ select @tablename = tablename from @table where id = @id
 set @sql =     'drop table if exists '+@schema+'.cln'+substring(@tablename,4,20)+';
 				select * into '+@schema+'.cln'+substring(@tablename,4,20)+' from '+@schema+'.'+@tablename+''
 
---print(@sql) 
+--print(@sql)
 exec(@sql)
 set @id = @id +1
 end
 ```
 
-2. Sometimes there are two files on the datalake. Therefore it's necessary to remove duplicates for each of the ingested tables. 
+2. Sometimes there are two files on the datalake. Therefore it's necessary to remove duplicates for each of the ingested tables.
 
-Example for P2P: 
+Example for P2P:
 
-```SQL 
+```SQL
 alter procedure [dbo].[p_cln_bsik] as
 
 with bsik_duplicates as (
     select *,
         row_number() over (
-            partition by 
+            partition by
                 company_code,
 				document_number,
-				[year], 
+				[year],
 				line_item
-		    order by 
+		    order by
                 company_code,
 				document_number,
-				[year], 
+				[year],
 				line_item
         ) row_num
-     from 
+     from
         cln_bsik
 )
 
@@ -589,9 +701,9 @@ delete from bsik_duplicates
 where row_num > 1
 ```
 
-Example For O2C: 
+Example For O2C:
 
-```SQL 
+```SQL
 alter procedure [o2c].[p_cln_bsad] as
 
 delete from o2c.cln_bsad
@@ -603,27 +715,27 @@ from o2c.cln_load_details as src
 where table_name = 'BSAD'
 ```
 
->The P2P Method has a longer runtime but makes sure that there can't be any duplicates, even if there would be an error in SAP while the option that was implemented for O2C is faster but in principle could still contain duplicaes if they existed in Source side. 
+>The P2P Method has a longer runtime but makes sure that there can't be any duplicates, even if there would be an error in SAP while the option that was implemented for O2C is faster but in principle could still contain duplicaes if they existed in Source side.
 
 3. Remove Characters that can't be used in CSV File
 
-```SQL 
+```SQL
 declare @table table
 (
-tablename varchar(50), 
+tablename varchar(50),
 columnname varchar(50),
 id int identity(1,1)
 )
 
 insert into @table(tablename,columnname)
-select table_name, column_name from config 
-where function_name = 'CLEAN_COLUMNS' 
+select table_name, column_name from config
+where function_name = 'CLEAN_COLUMNS'
 and db_schema = @schema
 
 declare @max int
-declare @sql varchar(max) 
+declare @sql varchar(max)
 declare @tablename varchar(50)
-declare @columnname varchar(50) 
+declare @columnname varchar(50)
 declare @id int = 1
 
 select @max = max(id) from @table
@@ -642,31 +754,31 @@ set @id = @id +1
 end
 ```
 
-The STA_* tables  are later printed as CSV files because SAP Analytics Cloud can currently not work with direct SQL access. Using CSV files has the disadvantage that the characters ',' and '"' can't be used. 
+The STA_* tables  are later printed as CSV files because SAP Analytics Cloud can currently not work with direct SQL access. Using CSV files has the disadvantage that the characters ',' and '"' can't be used.
 
 ',': It will cause the csv file to think the next column already starts and therefore mess up the whole file  
 ' " ': This character will tell the system to no regards this ',' as a separator which means that if itis at the end of a column can combine two columns and mess up the file.
 
-### Config ETL Functions 
+### Config ETL Functions
 
-Most ETL functions can be controlled via the config file in Excel. 
+Most ETL functions can be controlled via the config file in Excel.
 
 ![](2021-04-14-13-01-19.png)
 
 - Function name: Name of the ETL function
-- Table Name: Table for which the function should be executed 
-- Column Name: Column for which the function should be executed 
-- Parameter: Additional Parameters that the function might need 
-- Active: The line is active or not 
-- DB Schema: Database Schema for which the function should be executed 
+- Table Name: Table for which the function should be executed
+- Column Name: Column for which the function should be executed
+- Parameter: Additional Parameters that the function might need
+- Active: The line is active or not
+- DB Schema: Database Schema for which the function should be executed
 
-Currently there are 3 functions controlled with the config file that are used at several places in the pipeline: 
+Currently there are 3 functions controlled with the config file that are used at several places in the pipeline:
 
-- ADD_ZERO 
-- REMOVE_ZERO 
+- ADD_ZERO
+- REMOVE_ZERO
 - CLEAN_COLUMNS
 
-```SQL 
+```SQL
 ALTER procedure [o2c].[p_execute_etl_function] @imp_function nvarchar(max),
 												@imp_tablename nvarchar(max),
 												@schema varchar(max)
@@ -674,17 +786,17 @@ as
 
 declare @table table
 (
-table_name varchar(max), 
+table_name varchar(max),
 column_name varchar(max),
 parameter varchar(max),
 id varchar(max)
 )
 
 declare @max int
-declare @sql varchar(max) 
+declare @sql varchar(max)
 declare @tablename varchar(50)
-declare @columnname varchar(50) 
-declare @parameter varchar(max) 
+declare @columnname varchar(50)
+declare @parameter varchar(max)
 declare @id int = 1
 
 insert into @table(table_name, column_name, parameter, id)
@@ -698,22 +810,22 @@ begin
 
 	select @tablename = table_name, @columnname = column_name, @parameter = parameter from @table where id = @id
 
-	if @imp_function = 'REMOVE_ZERO' 
+	if @imp_function = 'REMOVE_ZERO'
 	begin
 	set @sql =  'update '+@schema+'.'+@tablename+ ' set '+@columnname+' = substring('+@columnname+', patindex(''%[^0]%'', '+@columnname+'+''.''), len('+@columnname+'))'
-	end 
+	end
 
-	if @imp_function = 'ADD_ZERO' 
-	begin 
+	if @imp_function = 'ADD_ZERO'
+	begin
 	if @parameter = '10'
 	begin
 	set @sql = 'update '+@schema+'.'+@tablename+' set '+@columnname+' = right(''0000000000''+isnull('+@columnname+',''''),10)'
-	end 
+	end
 	if @parameter = '4'
 	begin
-	set @sql = 'update '+@schema+'.'+@tablename+' set '+@columnname+' = right(''0000''+isnull('+@columnname+',''''),4)' 
+	set @sql = 'update '+@schema+'.'+@tablename+' set '+@columnname+' = right(''0000''+isnull('+@columnname+',''''),4)'
 	end
-	end 
+	end
 
 	exec (@sql)
 
@@ -724,21 +836,21 @@ end
 
 ### CLN_FI1000
 
-In order to make good use of FI1000 BW Query it must be unpivoted. Currently it ontains one measure for each month of sales. This way it can not be displayed correctly in any BI tool. This routine takes columns for each month and combines them into one column with the values and one date column for the month. 
+In order to make good use of FI1000 BW Query it must be unpivoted. Currently it ontains one measure for each month of sales. This way it can not be displayed correctly in any BI tool. This routine takes columns for each month and combines them into one column with the values and one date column for the month.
 
-```SQL 
-alter procedure [o2c].[p_cln_fi1000] as 
+```SQL
+alter procedure [o2c].[p_cln_fi1000] as
 
 declare @inyearmonth nvarchar(10)
 declare @fulldate nvarchar(10)
 declare @initdate date
-select @inyearmonth = max(monthyearfrom) from o2c.ing_fi1000 
+select @inyearmonth = max(monthyearfrom) from o2c.ing_fi1000
 select @fulldate = concat(right(@inyearmonth,4),left(@inyearmonth,2),'01')
 select @initdate = convert(date,@fulldate,102)
 
 drop table if exists o2c.#bwfi1000ar
 select company_code, customer_number,business_division,business_unit,credit_control_area,division,
-    case yearmonth 
+    case yearmonth
      when 'ar_month_0' then @initdate
 	 when 'ar_month_1' then dateadd(month,-1,@initdate)
 	 when 'ar_month_2' then dateadd(month,-2,@initdate)
@@ -754,7 +866,7 @@ select company_code, customer_number,business_division,business_unit,credit_cont
 	 when 'ar_month_12' then dateadd(month,-12,@initdate)
    end as postdate, 'aramount' as category, amount
  into o2c.#bwfi1000ar
- from 
+ from
 (
 	select  company_code,customer_number,business_division,business_unit,credit_control_area,division,ar_month_0 , ar_month_1,ar_month_2,
 	      ar_month_3,ar_month_4,ar_month_5,ar_month_6,ar_month_7,ar_month_8,ar_month_9,ar_month_10,ar_month_11,ar_month_12
@@ -770,7 +882,7 @@ unpivot (
 
 drop table if exists o2c.#bwfi1000sales
 select company_code, customer_number,business_division,business_unit,credit_control_area,division,
-    case yearmonth 
+    case yearmonth
      when 'sales_month_0' then @initdate
 	 when 'sales_month_1' then dateadd(month,-1,@initdate)
 	 when 'sales_month_2' then dateadd(month,-2,@initdate)
@@ -786,7 +898,7 @@ select company_code, customer_number,business_division,business_unit,credit_cont
 	 when 'sales_month_12' then dateadd(month,-12,@initdate)
    end as postdate, 'salesamount' as category,amount
  into o2c.#bwfi1000sales
- from 
+ from
 (
 	select  company_code,customer_number,business_division,business_unit,credit_control_area,division,sales_month_0 , sales_month_1,sales_month_2,
 	      sales_month_3,sales_month_4,sales_month_5,sales_month_6,sales_month_7,sales_month_8,sales_month_9,sales_month_10,sales_month_11,sales_month_12
@@ -803,7 +915,7 @@ unpivot (
  -- unpivot overdue amount
 drop table if exists o2c.#bwfi1000overdue
 select company_code, customer_number,business_division,business_unit,credit_control_area,division,
-    case yearmonth 
+    case yearmonth
      when 'overdue_month_0' then @initdate
 	 when 'overdue_month_1' then dateadd(month,-1,@initdate)
 	 when 'overdue_month_2' then dateadd(month,-2,@initdate)
@@ -819,7 +931,7 @@ select company_code, customer_number,business_division,business_unit,credit_cont
 	 when 'overdue_month_12' then dateadd(month,-12,@initdate)
    end as postdate, 'overdueamount' as category, amount
  into o2c.#bwfi1000overdue
- from 
+ from
 (
 	select  company_code,customer_number,business_division,business_unit,credit_control_area,division,
 	overdue_month_0 , overdue_month_1,overdue_month_2,overdue_month_3,overdue_month_4,overdue_month_5,overdue_month_6,overdue_month_7,overdue_month_8,
@@ -835,23 +947,23 @@ unpivot (
 
  drop table if exists o2c.#bwfi1000
  select *  into o2c.#bwfi1000 from o2c.#bwfi1000ar
- union all 
+ union all
  select * from o2c.#bwfi1000sales
- union all 
+ union all
  select * from o2c.#bwfi1000overdue
 
- --pivot 
+ --pivot
  drop table if exists o2c.cln_fi1000
- select company_code,customer_number,business_division,business_unit,credit_control_area,division,postdate, 
+ select company_code,customer_number,business_division,business_unit,credit_control_area,division,postdate,
  isnull(aramount,0) aramount ,isnull(salesamount,0) salesamount ,isnull(overdueamount,0) overdueamount
  into o2c.cln_fi1000
- from 
+ from
  (
  select company_code,customer_number,business_division,business_unit,credit_control_area,division,postdate,category,amount from o2c.#bwfi1000
  )p
-  pivot 
+  pivot
  (
-    sum(amount) for category in (aramount,salesamount,overdueamount) 
+    sum(amount) for category in (aramount,salesamount,overdueamount)
  ) as pvt
 
   order by  postdate
@@ -862,11 +974,11 @@ unpivot (
    drop table if exists o2c.#bwfi1000
 ```
 
-## Transform 1 and Transform 2 
+## Transform 1 and Transform 2
 
-In these stages all Joins are done. The Joins can only access tables that are in CLN stage or CLN and TP1 for Transform 2. 
+In these stages all Joins are done. The Joins can only access tables that are in CLN stage or CLN and TP1 for Transform 2.
 
-Transform 1 joins tables to Dimensions that can then be resued to join with multiple other FACT tables to the base models. e.g. combines the customer master tables KNA1 and KNB1 to the dimension customer. 
+Transform 1 joins tables to Dimensions that can then be resued to join with multiple other FACT tables to the base models. e.g. combines the customer master tables KNA1 and KNB1 to the dimension customer.
 
 |  Model | sta_all_items |sta_open_items_monthly|sta_irb_full|sta_irb_monthly|sta_all_cust_items|sta_open_cust_items| sta_eflow_clr|sta_eflow_likp|sta_fi1000|sta_payment_behavior|
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -880,9 +992,9 @@ SOURCE|EP1: bsik, bsak, t001,vf_kred,adrc, regup,bkpf <br>EXCEL:overdue_reason, 
 
 ### TP1_EKBE
 
-In the IRB model we watn to find out the invoice quantity and good received quatity for each purchase order and also the last GR posting for the invoice. SAP stores all of this information in table EKBE. However, the document for the good receipt value is in a different line than the invoice receipt. They are linked together with a reference document. The logic below works as follows. 
+In the IRB model we watn to find out the invoice quantity and good received quatity for each purchase order and also the last GR posting for the invoice. SAP stores all of this information in table EKBE. However, the document for the good receipt value is in a different line than the invoice receipt. They are linked together with a reference document. The logic below works as follows.
 
-1. create two helper tables with indexes as the workload can be many million rows 
+1. create two helper tables with indexes as the workload can be many million rows
 
 2. find and sum up all invoice lines (Q) and good receipt lines (E)
 
@@ -890,9 +1002,9 @@ In the IRB model we watn to find out the invoice quantity and good received quat
 
 4. delete duplicates based on PO. This is for the join of IR/GR PO quantity
 
-5. delete duplicates based on invoice document. This is to later join on IRB material document. 
+5. delete duplicates based on invoice document. This is to later join on IRB material document.
 
-```SQL 
+```SQL
 drop table if exists #ekbe_q
 drop table if exists #ekbe_e
 drop table if exists tp1_ekbe_po;
@@ -936,7 +1048,7 @@ create table #ekbe_e(
 	[movement_type] [nvarchar](max) null,
 	[download_date] [datetime2](7) null
 ) on [primary] textimage_on [primary]
--- for reverse movement types reverse quantity 
+-- for reverse movement types reverse quantity
 
 create nonclustered index ekbe_e_ref
     on #ekbe_e (reference_document, year_ref_doc,entry_date desc, material_document desc );   
@@ -944,127 +1056,127 @@ create nonclustered index ekbe_e_ref
 update cln_ekbe set quantity = quantity * -1 where debit_credit = 'h' ;
 
 with ekbe_sum_q as (
-    select 
+    select
         *,
 		sum(quantity) over (
-            partition by 
+            partition by
                 purchase_order
         ) quantity_sum,
         row_number() over (
-            partition by 
-			purchase_order 
-            order by 
+            partition by
+			purchase_order
+            order by
                 purchase_order
         ) row_num
-     from 
+     from
         cln_ekbe
 	where (po_history_category = 'q')
 	and reference_document <> ''
 )
 
-insert into #ekbe_q ( 
+insert into #ekbe_q (
 	 [purchase_order]
-	,[material_document] 
-	,[year_mat_doc] 
+	,[material_document]
+	,[year_mat_doc]
 	,[reference_document]
-	,[year_ref_doc] 
+	,[year_ref_doc]
 	,[posting_date]  
-	,[entry_date] 
-	,[created_by] 
-	,[po_history_category] 
-	,[plant] 
-	,[quantity] 
+	,[entry_date]
+	,[created_by]
+	,[po_history_category]
+	,[plant]
+	,[quantity]
 	,[file_path]
 	,[aa_number]
-	,[movement_type] 
-	,[download_date] 
+	,[movement_type]
+	,[download_date]
 )
-select 
+select
 	[purchase_order]
-	,[material_document] 
-	,[year_mat_doc] 
+	,[material_document]
+	,[year_mat_doc]
 	,[reference_document]
-	,[year_ref_doc] 
+	,[year_ref_doc]
 	,[posting_date]  
-	,[entry_date] 
-	,[created_by] 
-	,[po_history_category] 
-	,[plant] 
-	,[quantity_sum] 
+	,[entry_date]
+	,[created_by]
+	,[po_history_category]
+	,[plant]
+	,[quantity_sum]
 	,[file_path]
 	,[aa_number]
-	,[movement_type] 
-	,[download_date] 
+	,[movement_type]
+	,[download_date]
 	from ekbe_sum_q;
 
 with ekbe_sum_e as (
-    select 
+    select
         *,
 		sum(quantity) over (
-            partition by 
+            partition by
                 purchase_order
         ) quantity_sum,
         row_number() over (
-            partition by 
-			purchase_order 
-            order by 
+            partition by
+			purchase_order
+            order by
                 purchase_order
         ) row_num
-     from 
+     from
         cln_ekbe
 	where po_history_category = 'e'
 		and reference_document <> ''
 )
 
-insert into #ekbe_e ( 
+insert into #ekbe_e (
 	 [purchase_order]
-	,[material_document] 
-	,[year_mat_doc] 
+	,[material_document]
+	,[year_mat_doc]
 	,[reference_document]
-	,[year_ref_doc] 
+	,[year_ref_doc]
 	,[posting_date]  
-	,[entry_date] 
-	,[created_by] 
-	,[po_history_category] 
-	,[plant] 
-	,[quantity] 
+	,[entry_date]
+	,[created_by]
+	,[po_history_category]
+	,[plant]
+	,[quantity]
 	,[file_path]
 	,[aa_number]
-	,[movement_type] 
-	,[download_date] 
+	,[movement_type]
+	,[download_date]
 )
-select 
+select
 	[purchase_order]
-	,[material_document] 
-	,[year_mat_doc] 
+	,[material_document]
+	,[year_mat_doc]
 	,[reference_document]
-	,[year_ref_doc] 
+	,[year_ref_doc]
 	,[posting_date]  
-	,[entry_date] 
-	,[created_by] 
-	,[po_history_category] 
-	,[plant] 
-	,[quantity_sum] 
+	,[entry_date]
+	,[created_by]
+	,[po_history_category]
+	,[plant]
+	,[quantity_sum]
 	,[file_path]
 	,[aa_number]
-	,[movement_type] 
-	,[download_date] 
+	,[movement_type]
+	,[download_date]
 	from ekbe_sum_e;
 
 with ekbe_delete_suplicates as (
-    select 
+    select
         *,
         row_number() over (
-            partition by 
+            partition by
 			reference_document,
 			year_ref_doc
-            order by 
-            reference_document, 
+            order by
+            reference_document,
 			year_ref_doc,
 			entry_date desc,
 			material_document desc
         ) row_num
-     from 
+     from
         #ekbe_e
 	where po_history_category = 'e'
 )
@@ -1072,8 +1184,8 @@ with ekbe_delete_suplicates as (
 delete from ekbe_delete_suplicates
 where row_num > 1
 
-select q.material_document, 
-	   q.year_mat_doc, 
+select q.material_document,
+	   q.year_mat_doc,
 	   q.purchase_order,
 	   e.material_document as reference_document,
 	   e.year_ref_doc as year_ref_doc,
@@ -1083,25 +1195,25 @@ select q.material_document,
 	   e.quantity as gr_quantity,
 	   q.quantity as ir_quantity
 into dbo.tp1_ekbe_ref from #ekbe_q as q
-left outer join #ekbe_e as e on 
-q.reference_document = e.reference_document and 
+left outer join #ekbe_e as e on
+q.reference_document = e.reference_document and
 q.year_ref_doc = e.year_ref_doc;
 
-select * into dbo.tp1_ekbe_po from tp1_ekbe_ref; 
+select * into dbo.tp1_ekbe_po from tp1_ekbe_ref;
 
 with ekbe_ref_del_duplicates as (
-    select 
+    select
         *,
         row_number() over (
-            partition by 
-                year_mat_doc, 
-                material_document
-            order by 
+            partition by
                 year_mat_doc,
-				material_document, 
+                material_document
+            order by
+                year_mat_doc,
+				material_document,
 				ref_doc_entry_date desc
         ) row_num
-     from 
+     from
      tp1_ekbe_ref
 )
 
@@ -1109,15 +1221,15 @@ delete from ekbe_ref_del_duplicates
 where row_num > 1;
 
 with ekbe_po_del_duplicates as (
-    select 
+    select
         *,
         row_number() over (
-            partition by 
+            partition by
                 purchase_order
-            order by 
+            order by
                 purchase_order
         ) row_num
-     from 
+     from
      tp1_ekbe_po
 )
 
@@ -1132,20 +1244,20 @@ drop table if exists #ekbe_e
 
 ```
 
-## Transform 3 
+## Transform 3
 
-In this stage all Business Logic is added. 
+In this stage all Business Logic is added.
 
-### P_TP30_ALL_ITEMS 
+### P_TP30_ALL_ITEMS
 
 ```SQL
 alter procedure [dbo].[p_tp30_all_items] as
 
 update tp3_all_items set key_date = eomonth(src_download_date,-1)
 
-update tp3_all_items set due_date = dbo.fc_calculate_due_date_ap(convert(date, baseline_date,104),convert(int,days1),convert(int,days2), debit_credit,follow_on_doc) 
+update tp3_all_items set due_date = dbo.fc_calculate_due_date_ap(convert(date, baseline_date,104),convert(int,days1),convert(int,days2), debit_credit,follow_on_doc)
 
-update tp3_all_items set arrears_after_net = dbo.fc_calculate_arrears(due_date,key_date) 
+update tp3_all_items set arrears_after_net = dbo.fc_calculate_arrears(due_date,key_date)
 
 update tp3_all_items set transaction_key = concat([year],company_code,document_number,line_item)
 
@@ -1158,11 +1270,11 @@ update tp3_all_items set wht = 'withholding tax' where left(reference,3) = 'wht'
 update tp3_all_items set duplicate = 'x' where charindex('v',reference) <> 0
 ```
 
-#### Key Date 
+#### Key Date
 
-The Keydate is a very important column as it reflect the day of reporting from financial perspective. Therefore all models contain this field to mark the day of reporting. It's always set as the last day of the last month. e.g. today is 2021-04-05 --> Keydate = 2021-03-31 
+The Keydate is a very important column as it reflect the day of reporting from financial perspective. Therefore all models contain this field to mark the day of reporting. It's always set as the last day of the last month. e.g. today is 2021-04-05 --> Keydate = 2021-03-31
 
-#### Recalculate Due Date and Arrears after Net 
+#### Recalculate Due Date and Arrears after Net
 
 These columns are indicating when an items is due and how many days passed after the due date bzw. how many days until the item will be due. This information is dynamically generated in EP1 and must therefore be recalculated
 
@@ -1179,27 +1291,27 @@ declare @duedate date
 
 if @debit_credit = 's' and @follow_on_doc = ''
 	begin
-	set @duedate = @start 
-	end 
-else 
+	set @duedate = @start
+	end
+else
 	begin
-	if @days2 = 0 
-		begin 
-		set @duedate = dateadd(day,@days1,@start) 
-		end 
+	if @days2 = 0
+		begin
+		set @duedate = dateadd(day,@days1,@start)
+		end
 	else
 		begin
 		set @duedate = dateadd(day, @days2, @start)
-		end 
+		end
 end
 
-return @duedate 
+return @duedate
 
 end
 ```
 
 **Recalculate time passed after due date / before due date**
-```SQL 
+```SQL
 alter function [dbo].[fc_calculate_arrears]
 (@start date, @end date)
 returns int
@@ -1218,22 +1330,22 @@ end
 
 ```SQL
 alter procedure [dbo].[p_tp30_irb] as
-	update tp3_irb set scan_date_to_input_date = dbo.fc_get_business_days(scan_date, convert(date, input_date,104)) 
-	update tp3_irb set input_date_to_posting_date = dbo.fc_get_business_days(convert(date, input_date,104), convert(date, entered_on_date, 104)) 
+	update tp3_irb set scan_date_to_input_date = dbo.fc_get_business_days(scan_date, convert(date, input_date,104))
+	update tp3_irb set input_date_to_posting_date = dbo.fc_get_business_days(convert(date, input_date,104), convert(date, entered_on_date, 104))
 
-	update tp3_irb set eiv_autopost= 'yes' 
+	update tp3_irb set eiv_autopost= 'yes'
 	where invoice_input_channel = 'eiv' and
-		  ts_error_01 is null and 
-		  ts_error_02 is null and 
-		  ts_error_03 is null and 
-		  ts_error_04 is null and 
-		  ts_error_05 is null and 
-		  ts_error_06 is null and 
-		  ts_error_07 is null and 
-		  ts_error_08 is null 
+		  ts_error_01 is null and
+		  ts_error_02 is null and
+		  ts_error_03 is null and
+		  ts_error_04 is null and
+		  ts_error_05 is null and
+		  ts_error_06 is null and
+		  ts_error_07 is null and
+		  ts_error_08 is null
 
 	update tp3_irb set eiv_autopost = 'no'
-	where eiv_autopost is null and 
+	where eiv_autopost is null and
 		  invoice_input_channel = 'eiv'
 
 	update tp3_irb set eiv_autopost= 'n/a'
@@ -1241,7 +1353,7 @@ alter procedure [dbo].[p_tp30_irb] as
 
 update tp3_irb set key_date = eomonth(src_download_date,-1)
 
-update tp3_irb set amount_eur = o2c.fc_convert_currency(currency,convert(decimal(30,2),amount_document), 'eur') 
+update tp3_irb set amount_eur = o2c.fc_convert_currency(currency,convert(decimal(30,2),amount_document), 'eur')
 
 update tp3_irb set gr_quantity = 0
 where gr_quantity is null
@@ -1257,9 +1369,9 @@ Some KPI like scan_date_to_input_date can not be calculated excluding business d
 
 ![](2021-04-13-14-41-20.png)
 
-This table is then used in a function to calculate the business days between Scandate & Inputdate resp. Inputdate & Posting date 
+This table is then used in a function to calculate the business days between Scandate & Inputdate resp. Inputdate & Posting date
 
-```SQL 
+```SQL
 
 alter function [dbo].[fc_get_business_days]
 (@from datetime, @to datetime)
@@ -1272,11 +1384,11 @@ declare @days int
 if @from = '' or @to = ''
 begin  
 	set @days = 0
-end 
-else 
-begin 
+end
+else
+begin
 	select @days = count(*)+1
-	from cln_payment_calendar 
+	from cln_payment_calendar
 	where datepart(dw, dates) not in (1,7)   
 	and china_public_holiday is null
 	and dates > @from and dates <= @to
@@ -1287,17 +1399,17 @@ end
 ```
 
 **Convert Currency**
-In SAC there is no real option to recalculate the exchange rate if more than one currency is involved. E.g. CNY --> EUR no problem. HKD or CNY --> EUR = problem 
+In SAC there is no real option to recalculate the exchange rate if more than one currency is involved. E.g. CNY --> EUR no problem. HKD or CNY --> EUR = problem
 
 Therefore the Exchange rate table dbo. currency was created:
 
 ![](2021-04-13-14-48-20.png)
 
->In this table the Budget rate in maintained. Currently this is not controlled with Excel as it only changes once a year. Business will create a ticket for IT to manually change it. Currently it's not necessary to use different rates for different time frames. 
+>In this table the Budget rate in maintained. Currently this is not controlled with Excel as it only changes once a year. Business will create a ticket for IT to manually change it. Currently it's not necessary to use different rates for different time frames.
 
 This table is then used in the convert currency function
 
-```SQL 
+```SQL
 alter function [o2c].[fc_convert_currency]
 (@curr1 nvarchar(max), @amount1 decimal(30,2), @curr2 nvarchar(max))
 returns decimal(30,2)
@@ -1306,29 +1418,29 @@ begin
 
 declare @amount2 decimal(30,2)
 
-set @amount2 =  @amount1 / (select max(exchangerate) 
-							from o2c.currency 
-							where currency1 = @curr1 
-									and 
+set @amount2 =  @amount1 / (select max(exchangerate)
+							from o2c.currency
+							where currency1 = @curr1
+									and
 								  currency2 = @curr2)
 
 return @amount2
 end
 ```
 
-### P_TP30_ALL_CUST_ITEMS 
+### P_TP30_ALL_CUST_ITEMS
 
-```SQL 
-alter procedure [o2c].[p_tp30_all_cust_items] as 
+```SQL
+alter procedure [o2c].[p_tp30_all_cust_items] as
 update o2c.tp3_all_cust_items set key_date = eomonth(src_download_date,-1)
 
-update o2c.tp3_all_cust_items set due_date = o2c.fc_calculate_due_date_ar(convert(date, baseline_date,104),convert(int,days1),convert(int,days2), debit_credit,follow_on_doc) 
+update o2c.tp3_all_cust_items set due_date = o2c.fc_calculate_due_date_ar(convert(date, baseline_date,104),convert(int,days1),convert(int,days2), debit_credit,follow_on_doc)
 
 update o2c.tp3_all_cust_items set arrears_after_net = dbo.fc_calculate_arrears(due_date,key_date)
-where clearing_date is null 
+where clearing_date is null
 
 update o2c.tp3_all_cust_items set arrears_after_net = dbo.fc_calculate_arrears(due_date,clearing_date)
-where clearing_date is not null 
+where clearing_date is not null
 
 update o2c.tp3_all_cust_items set amount_local = amount_local * -1 where debit_credit = 'H'
 
@@ -1340,7 +1452,7 @@ update o2c.tp3_all_cust_items set company_code_currency = 'HKD' where company_co
 
 update o2c.tp3_all_cust_items set company_code_currency = 'CNY' where company_code <> '0078'
 
-update o2c.tp3_all_cust_items set amount_eur = o2c.fc_convert_currency(company_code_currency,convert(decimal(30,2),amount_local), 'EUR') 
+update o2c.tp3_all_cust_items set amount_eur = o2c.fc_convert_currency(company_code_currency,convert(decimal(30,2),amount_local), 'EUR')
 
 update o2c.tp3_all_cust_items set dispute_created_on = LEFT(dispute_created_on,8)
 
@@ -1348,17 +1460,17 @@ update o2c.tp3_all_cust_items set dispute_changed_on = LEFT(dispute_changed_on,8
 
 update o2c.tp3_all_cust_items set dispute_closed_on = LEFT(dispute_closed_on,8)
 
-update o2c.tp3_all_cust_items set dispute_closed_on = null 
-where left(dispute_closed_on,1) <> '2' and 
+update o2c.tp3_all_cust_items set dispute_closed_on = null
+where left(dispute_closed_on,1) <> '2' and
 	  left(dispute_closed_on,1) <> ''
 
-update o2c.tp3_all_cust_items set reference_key1 = '' 
-where left(reference_key1,1) <> '2' and 
+update o2c.tp3_all_cust_items set reference_key1 = ''
+where left(reference_key1,1) <> '2' and
 	  left(reference_key1,1) <> ''
 
 update o2c.tp3_all_cust_items set days1_vat = o2c.fc_calculate_days1(payment_terms, reference_key1)
 where payment_terms <> '' and  
-	  reference_key1 <> '' 
+	  reference_key1 <> ''
 
 update o2c.tp3_all_cust_items set days1_vat = days1
 where payment_terms = '' or  
@@ -1380,46 +1492,46 @@ update o2c.tp3_all_cust_items set due_date_vat = due_date
 where payment_terms = '' or  
 	  reference_key1 = ''
 
-update o2c.tp3_all_cust_items set arrears_after_net_vat = dbo.fc_calculate_arrears(due_date_vat,key_date) 
+update o2c.tp3_all_cust_items set arrears_after_net_vat = dbo.fc_calculate_arrears(due_date_vat,key_date)
 where payment_terms <> '' and
-	  reference_key1 <> '' and 
-	  clearing_date is null 
+	  reference_key1 <> '' and
+	  clearing_date is null
 
-update o2c.tp3_all_cust_items set arrears_after_net_vat = dbo.fc_calculate_arrears(due_date_vat,clearing_date) 
+update o2c.tp3_all_cust_items set arrears_after_net_vat = dbo.fc_calculate_arrears(due_date_vat,clearing_date)
 where payment_terms <> '' and
-	  reference_key1 <> '' and 
+	  reference_key1 <> '' and
 	  clearing_date is not null
 
 update o2c.tp3_all_cust_items set arrears_after_net_vat = arrears_after_net
 where payment_terms = '' or  
 	  reference_key1 = ''
 
-update o2c.tp3_all_cust_items set posting_to_clearing_days = dbo.FC_GET_BUSINESS_DAYS(CONVERT(date, posting_date,104), CONVERT(date, clearing_date,104)) 
+update o2c.tp3_all_cust_items set posting_to_clearing_days = dbo.FC_GET_BUSINESS_DAYS(CONVERT(date, posting_date,104), CONVERT(date, clearing_date,104))
 
-update o2c.tp3_all_cust_items set relevant_for_payment_behavior = 'X' 
-where 
-	(company_code = '0078' 
-	 and debit_credit = 'S') 
-	 or 
+update o2c.tp3_all_cust_items set relevant_for_payment_behavior = 'X'
+where
+	(company_code = '0078'
+	 and debit_credit = 'S')
+	 or
 	(company_code = '0083'  
 	 and debit_credit = 'S'
 	 and not contains(item_text, 'quality')
 	 and not contains(item_text, 'price')
 	 and not contains(item_text, 'write')
 	 and not contains(item_text, 'sample'))
-	 or 
+	 or
 	 (company_code = '0289'
-	 and debit_credit = 'S') 
-	 or 
+	 and debit_credit = 'S')
+	 or
 	 (company_code = '0369'
-	 and debit_credit = 'S') 
-	 or 
-	 (company_code = '0199' 
-	 and debit_credit = 'S' 
+	 and debit_credit = 'S')
+	 or
+	 (company_code = '0199'
+	 and debit_credit = 'S'
 	 and reference <> LEFT('INV.',4)
 	 and not contains(item_text, 'price')
-	 and not contains(item_text, 'deduction') 
-	 and not contains(item_text, '保证金') 
+	 and not contains(item_text, 'deduction')
+	 and not contains(item_text, '保证金')
 	 and not contains(item_text, '质量')
 	 and not contains(item_text, '质保金')
 	 and not contains(item_text, '三包')
@@ -1428,7 +1540,7 @@ where
 	 and not contains(item_text, '折让')
 	 and not contains(item_text, '税'))
 
-update o2c.tp3_all_cust_items set relevant_for_payment_behavior = '' 
+update o2c.tp3_all_cust_items set relevant_for_payment_behavior = ''
 where reverse_document = 'X' and MONTH(key_date) < MONTH(clearing_date)
 
 update o2c.tp3_all_cust_items set overdue_rank = '1-30'
@@ -1456,19 +1568,19 @@ update o2c.tp3_all_cust_items set overdue_rank_vat = 'not_due'
 where arrears_after_net_vat <= 0
 
 update o2c.tp3_all_cust_items set overdue_value = amount_local
-where relevant_for_payment_behavior = 'X' 
+where relevant_for_payment_behavior = 'X'
 
 update o2c.tp3_all_cust_items set vat_issued = 'VAT issued' where left(REFERENCE,3) = 'INV'
 update o2c.tp3_all_cust_items set vat_issued = 'no VAT' where left(REFERENCE,3) <> 'INV'
 ```
 
-####Recalculate Due Days based on VAT issue date 
+####Recalculate Due Days based on VAT issue date
 
-similar to the P2P side also for O2C side the due date and Arrears after net must be recalculated. Additionally there is the requirement to calculate the due date based on the VAT due date (Reference_key1 field) This way the Duedate based on Baseline date and Real VAT date can be compared in a report. This requires to also recalculate Days1 and Days2 based on the reference_key_1 and payment term table t052: 
+similar to the P2P side also for O2C side the due date and Arrears after net must be recalculated. Additionally there is the requirement to calculate the due date based on the VAT due date (Reference_key1 field) This way the Duedate based on Baseline date and Real VAT date can be compared in a report. This requires to also recalculate Days1 and Days2 based on the reference_key_1 and payment term table t052:
 
 ![](2021-04-13-15-04-47.png)
 
-```SQL 
+```SQL
 alter function [o2c].[fc_calculate_days1]
 (@payment_terms nvarchar(max), @baseline_date nvarchar(max))
 returns int
@@ -1478,57 +1590,57 @@ begin
 --declare @payment_terms as nvarchar(max)
 --declare @baseline_date as nvarchar(max)
 declare @days1 as int
-declare @days1_fixed as int 
+declare @days1_fixed as int
 declare @due_date_special1 as int
-declare @month_special1 as int 
-declare @date as date 
+declare @month_special1 as int
+declare @date as date
 declare @day_limit as int
 
 --set @payment_terms = 'z304'
 --set @baseline_date = '2021-01-09 00:00:00.0000000'
 
 set @day_limit = (select min(day_limit)
-					from o2c.cln_t052 
+					from o2c.cln_t052
 					where payment_term = @payment_terms)
 
 set @baseline_date = try_convert(date,@baseline_date)
 set @days1 = 0
 
 if @day_limit = 0
-begin 
+begin
 	set @days1_fixed = (select max(days1_fixed)
-						from o2c.cln_t052 
+						from o2c.cln_t052
 						where payment_term = @payment_terms)
 
 	set @due_date_special1 = (
-						select max(due_date_special1) 
-						from o2c.cln_t052 
+						select max(due_date_special1)
+						from o2c.cln_t052
 						where payment_term = @payment_terms)
 
 	set @month_special1 = (
 						select max(month_special1)
-						from o2c.cln_t052 
+						from o2c.cln_t052
 						where payment_term = @payment_terms)
-end 
-else 
+end
+else
 begin
 	set @days1_fixed = (select top 1 days1_fixed
-						from o2c.cln_t052 
-						where payment_term = @payment_terms and 
-						day_limit >= right(@baseline_date,2) 
+						from o2c.cln_t052
+						where payment_term = @payment_terms and
+						day_limit >= right(@baseline_date,2)
 						order by day_limit)
 
 	set @due_date_special1 = (
 						select top 1 due_date_special1
-						from o2c.cln_t052 
-						where payment_term = @payment_terms and 
+						from o2c.cln_t052
+						where payment_term = @payment_terms and
 						day_limit >= right(@baseline_date,2)
 						order by day_limit)
-	
+
 	set @month_special1 = (
 						select top 1 month_special1
-						from o2c.cln_t052 
-						where payment_term = @payment_terms and 
+						from o2c.cln_t052
+						where payment_term = @payment_terms and
 						day_limit >= right(@baseline_date,2)
 						order by day_limit)
 end
@@ -1539,24 +1651,24 @@ if @due_date_special1 > 0 or @month_special1 > 0
 begin
 	set @date = @baseline_date
 
-	if @days1_fixed > 0 
+	if @days1_fixed > 0
 	begin
 	    set @date =  dateadd(day,@days1_fixed,convert(date,@baseline_date))
-	end 
---		date calculation 
+	end
+--		date calculation
 	set @date = dateadd(month,@month_special1,@date)
-	
+
 	if @due_date_special1 = 31
-	begin 
+	begin
 		set @due_date_special1 = right(eomonth(@date),2)
 	end
 
 	set @date = datefromparts(left(@date,4),right(left(@date,7),2),@due_date_special1)
 
-	if  @date < @baseline_date 
-	begin	
-		set	@baseline_date = @date 
-	end 
+	if  @date < @baseline_date
+	begin
+		set	@baseline_date = @date
+	end
 
 	set @days1 = datediff(day,@baseline_date,@date)
 
@@ -1564,41 +1676,41 @@ end
 return @days1
 end
 ```
-> There's another function [o2c].[fc_calculate_days2] that calculates Days2 in a similar way. Unfortunately, there was no easy way to combine the two without increasing the complexity a lot. 
+> There's another function [o2c].[fc_calculate_days2] that calculates Days2 in a similar way. Unfortunately, there was no easy way to combine the two without increasing the complexity a lot.
 
-Based on these newly calculated Days1 and Days2 the duedate and arrears are calculated again. This is similar to the P2P function. 
+Based on these newly calculated Days1 and Days2 the duedate and arrears are calculated again. This is similar to the P2P function.
 
 #### Include only specific documents for payment behavior calculation
 
-From Business side a lot of documents like warranty, deduction, write offs must be excluded to make the analysis valuable. Therefore the text field must be used to identify the documents: 
+From Business side a lot of documents like warranty, deduction, write offs must be excluded to make the analysis valuable. Therefore the text field must be used to identify the documents:
 
 >The result will be used to aggregate data in STA_PAYMENT_BEHAVIOR
 
-```SQL 
-update o2c.tp3_all_cust_items set relevant_for_payment_behavior = 'X' 
-where 
-	(company_code = '0078' 
-	 and debit_credit = 'S') 
-	 or 
+```SQL
+update o2c.tp3_all_cust_items set relevant_for_payment_behavior = 'X'
+where
+	(company_code = '0078'
+	 and debit_credit = 'S')
+	 or
 	(company_code = '0083'  
 	 and debit_credit = 'S'
 	 and not contains(item_text, 'quality')
 	 and not contains(item_text, 'price')
 	 and not contains(item_text, 'write')
 	 and not contains(item_text, 'sample'))
-	 or 
+	 or
 	 (company_code = '0289'
-	 and debit_credit = 'S') 
-	 or 
+	 and debit_credit = 'S')
+	 or
 	 (company_code = '0369'
-	 and debit_credit = 'S') 
-	 or 
-	 (company_code = '0199' 
-	 and debit_credit = 'S' 
+	 and debit_credit = 'S')
+	 or
+	 (company_code = '0199'
+	 and debit_credit = 'S'
 	 and reference <> LEFT('INV.',4)
 	 and not contains(item_text, 'price')
-	 and not contains(item_text, 'deduction') 
-	 and not contains(item_text, '保证金') 
+	 and not contains(item_text, 'deduction')
+	 and not contains(item_text, '保证金')
 	 and not contains(item_text, '质量')
 	 and not contains(item_text, '质保金')
 	 and not contains(item_text, '三包')
@@ -1612,9 +1724,9 @@ where
 
    ![](2021-04-13-15-19-38.png)
 
-   >As this is a one time step the code is not included in the stored procedures 
+   >As this is a one time step the code is not included in the stored procedures
 
-Afterwards the table can be indexed: 
+Afterwards the table can be indexed:
 
 ```SQL
 ALTER procedure [o2c].[p_tp30_first] as
@@ -1624,50 +1736,50 @@ ALTER procedure [o2c].[p_tp30_first] as
   create fulltext index on  o2c.tp3_all_cust_items (
     item_text language 0
   ) key index i1
-  with 
-    change_tracking = auto, 
+  with
+    change_tracking = auto,
     stoplist=off
   ;
 ```
-   
-## Stage 
+
+## Stage
 
 Based on the full data models, several models are created based on business needs. These tables will later be loaded used to be Loaded into SAC (could be consumed by any other BI tool)
 
 
-#### STA_ALL_ITEMS 
+#### STA_ALL_ITEMS
 
-The ALL_ITEMS Model contains all items that are either open or have been cleared during the last year. The model therefore monthly updates and contains data for one year. 
+The ALL_ITEMS Model contains all items that are either open or have been cleared during the last year. The model therefore monthly updates and contains data for one year.
 
 #### STA_OPEN ITEMS_MONTHLY
 
-The Open items model contains all items that were open at the end of each month for the last year. e.g. all open items on 31.03, 30.04, 31.05 etc. 
+The Open items model contains all items that were open at the end of each month for the last year. e.g. all open items on 31.03, 30.04, 31.05 etc.
 
-This is achieved by calculating back in time on the cleared items column in the TP3_ALL_ITEMS table. If an item is currently open or was cleared after a the given keydate and was posted before the keydate it was open at that time and therefore will be printed into the output model. 
+This is achieved by calculating back in time on the cleared items column in the TP3_ALL_ITEMS table. If an item is currently open or was cleared after a the given keydate and was posted before the keydate it was open at that time and therefore will be printed into the output model.
 
-In this model open items can occur multiple times as an item can be open in Jan and Feb and March etc. Therefoe the primary key is the transaction_key and the key_date column. 
+In this model open items can occur multiple times as an item can be open in Jan and Feb and March etc. Therefoe the primary key is the transaction_key and the key_date column.
 
-After the open items are selected the Arrears after net must be recalculated based on the keydate. 
+After the open items are selected the Arrears after net must be recalculated based on the keydate.
 
-```SQL 
+```SQL
 declare @keydate_tp3 date
-declare @month int 
-set @month = 0 
+declare @month int
+set @month = 0
 
 set @keydate_tp3 = (select max(key_date) from dbo.tp3_all_items)
 
 drop table if exists sta_open_items_monthly
 
-select 
+select
 client,
-	company_code, 
-	document_number, 
+	company_code,
+	document_number,
 	line_item,
 	vendor_number,
-	document_type, 
+	document_type,
 	special_gl_indicator,
 	payment_block,
-	payment_terms, 
+	payment_terms,
 	scb_indicator,
 	gl_account,
 	clearing_document,
@@ -1704,7 +1816,7 @@ client,
 	reason,
 	reason_details,
 	china_public_holiday,
-	domestic_3rd_payment, 
+	domestic_3rd_payment,
 	oversea_3rd_payment,
 	oversea_ic_payment,
 	key_date,
@@ -1715,25 +1827,25 @@ client,
 	duplicate
 into dbo.sta_open_items_monthly
 from dbo.tp3_all_items
-where posting_date <= @keydate_tp3 and 
+where posting_date <= @keydate_tp3 and
 	( clearing_date is null or clearing_date > @keydate_tp3 );
 
 
 while (@month > -11)
-begin 
+begin
 
 set @keydate_tp3 = eomonth(dateadd(month,-1,@keydate_tp3))
 
 insert into dbo.sta_open_items_monthly (
 client,
-	company_code, 
-	document_number, 
+	company_code,
+	document_number,
 	line_item,
 	vendor_number,
-	document_type, 
+	document_type,
 	special_gl_indicator,
 	payment_block,
-	payment_terms, 
+	payment_terms,
 	scb_indicator,
 	gl_account,
 	clearing_document,
@@ -1770,7 +1882,7 @@ client,
 	reason,
 	reason_details,
 	china_public_holiday,
-	domestic_3rd_payment, 
+	domestic_3rd_payment,
 	oversea_3rd_payment,
 	oversea_ic_payment,
 	key_date,
@@ -1779,16 +1891,16 @@ client,
 	transaction_key,
 	wht,
 	duplicate)
-select 
+select
 client,
-	company_code, 
-	document_number, 
+	company_code,
+	document_number,
 	line_item,
 	vendor_number,
-	document_type, 
+	document_type,
 	special_gl_indicator,
 	payment_block,
-	payment_terms, 
+	payment_terms,
 	scb_indicator,
 	gl_account,
 	clearing_document,
@@ -1825,7 +1937,7 @@ client,
 	reason,
 	reason_details,
 	china_public_holiday,
-	domestic_3rd_payment, 
+	domestic_3rd_payment,
 	oversea_3rd_payment,
 	oversea_ic_payment,
 	null,
@@ -1835,50 +1947,50 @@ client,
 	wht,
 	duplicate
 from dbo.tp3_all_items
-where posting_date <= @keydate_tp3 and 
+where posting_date <= @keydate_tp3 and
 	( clearing_date is null or clearing_date > @keydate_tp3 );
 
-update dbo.sta_open_items_monthly set key_date = @keydate_tp3 
+update dbo.sta_open_items_monthly set key_date = @keydate_tp3
 where key_date is null
 
-set @month = @month -1 
+set @month = @month -1
 end
 
-update dbo.sta_open_items_monthly set arrears_after_net = dbo.fc_calculate_arrears(due_date,key_date) 
+update dbo.sta_open_items_monthly set arrears_after_net = dbo.fc_calculate_arrears(due_date,key_date)
 
 exec o2c.p_execute_etl_function @imp_function = 'remove_zero', @imp_tablename = 'sta_open_items_monthly', @schema = 'dbo'
 ```
 
-#### STA_IRB_FULL 
+#### STA_IRB_FULL
 
-This model contains the key_date month + 12 months of prior data 
+This model contains the key_date month + 12 months of prior data
 
-#### STA_IRB_MONTHLY 
+#### STA_IRB_MONTHLY
 
-This is the only model that can not be completely rebuilt with each run. This the model should reflect the last 12 months of parked invoices at the second business day of each month. Unfortunatly the Invoice receipt book has no column to check when the change from parked to posted occured. e.g. in the open items models we can use the clearing date. 
+This is the only model that can not be completely rebuilt with each run. This the model should reflect the last 12 months of parked invoices at the second business day of each month. Unfortunatly the Invoice receipt book has no column to check when the change from parked to posted occured. e.g. in the open items models we can use the clearing date.
 
-This means that with every run we have to freeze the first result of each month in this table. Because the state changes afterwards. This causes the following restrictions that are acceptable by local business. 
+This means that with every run we have to freeze the first result of each month in this table. Because the state changes afterwards. This causes the following restrictions that are acceptable by local business.
 
 1. Extension of this model with another column can not be done for past data. (unless there is a link)
 
-2. Reporting can never be at the exact 2nd working day of of the new month as the pipeline run is weekly and can not be adjusted with this business logic. 
+2. Reporting can never be at the exact 2nd working day of of the new month as the pipeline run is weekly and can not be adjusted with this business logic.
 
-3. If there is an error in the weekly run the result might be different for that month 
+3. If there is an error in the weekly run the result might be different for that month
 
-> There is a status table that we already imported to data lake during the project that contains the satus changed for each invoice. ZSI_IR_IC_STATLG. With this table we could calculate back and find the parked status for each invoice. Unfortunately there was not enough time to implement this during the project. This would be up to future developers :) 
+> There is a status table that we already imported to data lake during the project that contains the satus changed for each invoice. ZSI_IR_IC_STATLG. With this table we could calculate back and find the parked status for each invoice. Unfortunately there was not enough time to implement this during the project. This would be up to future developers :)
 
 ```SQL
-alter procedure [dbo].[p_sta_irb_monthly] as 
+alter procedure [dbo].[p_sta_irb_monthly] as
 
 -- monthly: insert all lines into the table that don't have the same month
 
-declare @keydate_tp3 date 
+declare @keydate_tp3 date
 declare @keydate_sta date
 
 set @keydate_tp3 = (select max(key_date) from tp3_irb)
 set @keydate_sta = (select max(key_date) from sta_irb_monthly)
 
-if @keydate_tp3 > @keydate_sta 
+if @keydate_tp3 > @keydate_sta
 begin
 
 insert into [dbo].[sta_irb_monthly]
@@ -2047,58 +2159,58 @@ where invoice_state = '11' or invoice_state = '12'
 
 update
     irb
-set 
+set
 	irb.accounting_clerk_name = vendor.accounting_clerk_name,
-	irb.accounting_clerk_number = vendor.accounting_clerk_number, 
-	irb.accounting_clerk_user = vendor.accounting_clerk_user, 
-	irb.vendor_name = vendor.vendor_name, 
-	irb.vendor_name_chinese = vendor.vendor_name_chinese, 
+	irb.accounting_clerk_number = vendor.accounting_clerk_number,
+	irb.accounting_clerk_user = vendor.accounting_clerk_user,
+	irb.vendor_name = vendor.vendor_name,
+	irb.vendor_name_chinese = vendor.vendor_name_chinese,
 	irb.vendor_country = vendor.vendor_country,
 	irb.company_name = company.company_name,
-	irb.company_name_short = company.company_name_short, 
+	irb.company_name_short = company.company_name_short,
 	irb.purchaser_name = purchaser.purchaser_name
 from
     sta_irb_monthly as irb
 	left join
 	tp1_vendor_dimension as vendor on
-    cast(irb.vendor_number as int) = cast(vendor.vendor_number as int) and 
+    cast(irb.vendor_number as int) = cast(vendor.vendor_number as int) and
 	irb.company_code = vendor.company_code
-	left join 
-	cln_t001 as company on 
+	left join
+	cln_t001 as company on
 	irb.company_code = company.company_code
-	left join 
-	cln_t024 as purchaser on 
+	left join
+	cln_t024 as purchaser on
 	irb.purchasing_group = purchaser.purchasing_group
 ```
 
 #### STA_ALL_CUST_ITEMS
 
-This model is similar to STA_ALL_ITEMS just for o2c side. 
+This model is similar to STA_ALL_ITEMS just for o2c side.
 
-#### STA_OPEN_CUST_ITEMS 
+#### STA_OPEN_CUST_ITEMS
 
-This model is similar to STA_OPEN_ITEMS_MONTHLY just for o2c side. 
+This model is similar to STA_OPEN_ITEMS_MONTHLY just for o2c side.
 
-#### STA_EFLOW_CLR 
+#### STA_EFLOW_CLR
 
-THis model contains EFLOW CLR workflow information. To track the KPI on release time 
+THis model contains EFLOW CLR workflow information. To track the KPI on release time
 
 
-```SQL 
+```SQL
 ALTER PROCEDURE [o2c].[p_sta_eflow_clr]
 AS
 BEGIN
 
   drop table if exists o2c.sta_eflow_clr
-	select processname,incident,steplabel,status, 
-	  case 
+	select processname,incident,steplabel,status,
+	  case
 	     when status = 1 then 'open'
 		 when status =3 then 'Complete'
 		 when status = 4 then 'Return'
 		 when status = 7 then 'Rejected'
 	  end as StatusText,
 	  substatus ,taskuser, assignedtouser,starttime,endtime,task_id,
-	  o2c.fc_cal_eflow_duration(starttime,endtime) as 'durationmin' 
+	  o2c.fc_cal_eflow_duration(starttime,endtime) as 'durationmin'
 	  into o2c.sta_eflow_clr
 	 from o2c.cln_eflowtask
 	 where processname = 'P047_CLR_01'   
@@ -2122,53 +2234,53 @@ if @from = '' or @to = ''
 	begin  
 		set @days = 0
 		set @durationmin = 0
-	end 
-else 
-	begin 
-		set @days = dbo.fc_get_business_days(@from,@to) - 1 
+	end
+else
+	begin
+		set @days = dbo.fc_get_business_days(@from,@to) - 1
 		set  @starttime = cast(@from as time(0))
 		set  @endtime = cast(@to as time(0))
 	-- only consider working time from 08:30 to 17:30
-		if @starttime >= cast('00:00:00' as time(0)) and  @starttime <= cast('08:30:00' as time(0)) 
+		if @starttime >= cast('00:00:00' as time(0)) and  @starttime <= cast('08:30:00' as time(0))
 		begin
 			set @starttime = cast('08:30:00' as time(0))
 		end
-		if @endtime >= cast('00:00:00' as time(0)) and  @endtime <= cast('08:30:00' as time(0)) 
+		if @endtime >= cast('00:00:00' as time(0)) and  @endtime <= cast('08:30:00' as time(0))
 		begin
 			set @endtime = cast('08:30:00' as time(0))
 		end
-	
+
 	-- set max time to 17:30:00
-		if @starttime >= cast('17:30:00' as time(0)) and  @starttime <= cast('23:59:59' as time(0)) 
+		if @starttime >= cast('17:30:00' as time(0)) and  @starttime <= cast('23:59:59' as time(0))
 		begin
 			set @starttime = cast('17:30:00' as time(0))
 		end
-		if @endtime >= cast('17:30:00' as time(0)) and  @endtime <= cast('23:59:59' as time(0)) 
+		if @endtime >= cast('17:30:00' as time(0)) and  @endtime <= cast('23:59:59' as time(0))
 		begin
 			set @endtime = cast('17:30:00' as time(0))
 		end
-	
+
 	    set @durationmin = datediff(minute,@starttime,@endtime) + @days * 540
 
 
 	end
 
 return ( @durationmin )
-end 
+end
 ```
 
 #### STA_EFLOW_LIKP
 
-This model combines the eflow for delivery note release with the delivery note data from SAP and customer data. This way business can identify which customers cause high volumes of handling. 
+This model combines the eflow for delivery note release with the delivery note data from SAP and customer data. This way business can identify which customers cause high volumes of handling.
 
-```SQL 
+```SQL
 alter procedure [o2c].[p_sta_eflow_likp] as
 
 -- create temperary table for transforming...
 
 drop table if exists o2c.#cln_dnsum
 select  a.processname,a.incident,right(concat('00000',dntbr),10) as delivery_nr ,
-b.task_id, b.steplabel, b.status, b.substatus, 
+b.task_id, b.steplabel, b.status, b.substatus,
 	   case
 	     when b.status = 1 then 'open'
 		 when b.status = 3 then 'complete'
@@ -2176,17 +2288,17 @@ b.task_id, b.steplabel, b.status, b.substatus,
 		 when b.status = 7 then 'rejected'
 	   end as statustext,
 	   b.starttime, b.endtime,
-	   case 
+	   case
 	    when b.status = 7 then 0
 		else  o2c.fc_cal_eflow_duration(b.starttime,b.endtime)  
-	   end as  'durationmin' 
+	   end as  'durationmin'
 into o2c.#cln_dnsum
-from o2c.cln_eflowdn as a 
-left outer join o2c.cln_eflowtask  as b 
-on a.processname = b.processname and a.incident = b.incident 
+from o2c.cln_eflowdn as a
+left outer join o2c.cln_eflowtask  as b
+on a.processname = b.processname and a.incident = b.incident
 where b.processname = 'p048_gr_01' and b.endtime >='2020-01-01'
 
--- delete temperary table 
+-- delete temperary table
 
 
 delete from o2c.#cln_dnsum where task_id is null ;
@@ -2194,13 +2306,13 @@ delete from o2c.#cln_dnsum where task_id is null ;
 with dn_duplicates as (
     select *,
         row_number() over (
-            partition by 
+            partition by
                 delivery_nr
-		    order by 
+		    order by
 		        delivery_nr,
 				convert(datetime,starttime) desc
         ) row_num
-     from 
+     from
         o2c.#cln_dnsum
 )
 delete from dn_duplicates
@@ -2212,8 +2324,8 @@ select a.*,
 	   d.trading_partner,
 	   d.customer_name1,
 	   d.customer_name2,
-       c.delivery_status, 
-	   c.gi_status, 
+       c.delivery_status,
+	   c.gi_status,
 	   c.billing_status,
 	   b.status,
 	   b.statustext,
@@ -2223,11 +2335,11 @@ select a.*,
 into o2c.sta_eflow_likp
 from o2c.cln_likp a
 left outer join o2c.#cln_dnsum b
-on a.delivery_nr = b.delivery_nr  and 
+on a.delivery_nr = b.delivery_nr  and
 convert(date,a.rel_cre_date) = convert(date,b.starttime)
 left outer join o2c.cln_vbuk c
 on a.delivery_nr = c.delivery_nr
-left outer join o2c.cln_kna1 d 
+left outer join o2c.cln_kna1 d
  on a.soldtoparty = d.customer_number
 order by durationmin desc
 
@@ -2238,38 +2350,38 @@ exec o2c.p_execute_etl_function @imp_function = 'remove_zero', @imp_tablename = 
 with measure_based_on_task_id as (
     select *,
         row_number() over (
-            partition by 
+            partition by
                 task_id
-            order by 
+            order by
 				task_id
         ) row_num
-     from 
+     from
         o2c.sta_eflow_likp
 )
 
 update o2c.sta_eflow_likp set o2c.sta_eflow_likp.durationmin_task_id = measure_based_on_task_id.durationmin
 from measure_based_on_task_id
-where measure_based_on_task_id.delivery_nr = o2c.sta_eflow_likp.delivery_nr and 
+where measure_based_on_task_id.delivery_nr = o2c.sta_eflow_likp.delivery_nr and
 row_num = 1
 
 ```
 
-#### STA_FI1000 
+#### STA_FI1000
 
-This model provides a usefully pivoted version of the BW FI1000 cube to be used in reporting for DSO and overdue percentages. 
+This model provides a usefully pivoted version of the BW FI1000 cube to be used in reporting for DSO and overdue percentages.
 
 
-#### STA_PAYMENT_BEHAVIOR 
+#### STA_PAYMENT_BEHAVIOR
 
-This special routine takes data from both the STA_OPEN_CUST_ITEMS and STA_ALL_CUST_ITEMS model in order to create a model that can compare overdues and total sales for customers. In order to do this the single open line items are clustered in overdue 30 / 60 / 90+ days and the aggregated for each customer. The Dashboard solution contains a scoring model that then clusteres the customers in good and bad payers. 
+This special routine takes data from both the STA_OPEN_CUST_ITEMS and STA_ALL_CUST_ITEMS model in order to create a model that can compare overdues and total sales for customers. In order to do this the single open line items are clustered in overdue 30 / 60 / 90+ days and the aggregated for each customer. The Dashboard solution contains a scoring model that then clusteres the customers in good and bad payers.
 
-```SQL 
-alter procedure [o2c].[p_sta_payment_behavior] as 
+```SQL
+alter procedure [o2c].[p_sta_payment_behavior] as
 begin
 
 drop table if exists o2c.sta_payment_behavior
 drop table if exists #temp_od
-drop table if exists #temp_sum 
+drop table if exists #temp_sum
 drop table if exists #temp_cust;
 
 with sum_od as (
@@ -2277,18 +2389,18 @@ with sum_od as (
 		   key_date,
 		   overdue_rank_vat,
 		   sum(convert(float,overdue_value) ) over (
-            partition by 
-				convert(varchar(10),credit_account), 
+            partition by
+				convert(varchar(10),credit_account),
 				key_date,
-				convert(varchar(10),overdue_rank_vat) 
-            order by 
+				convert(varchar(10),overdue_rank_vat)
+            order by
                 convert(varchar(10),credit_account),
 				key_date ,
 				convert(varchar(10),overdue_rank)  
-			) overdue_value_by_ca 
-     from 
+			) overdue_value_by_ca
+     from
         o2c.sta_open_cust_items
-	 where credit_account is not null 
+	 where credit_account is not null
 	 and relevant_for_payment_behavior = 'x')
 
 
@@ -2300,55 +2412,55 @@ pivot (
   sum(overdue_value_by_ca)
   for overdue_rank_vat in (
    [1-30], [90+], [31-90], [not_due]
-  ) 
+  )
 )as p;
 
 
 with sum_sales as (
     select distinct credit_account,
 		   sum(convert(float,amount_local) ) over (
-            partition by 
+            partition by
 				convert(varchar(10),credit_account)
-            order by 
+            order by
                 convert(varchar(10),credit_account)
 			) sales_by_ca
-     from 
+     from
         o2c.sta_all_cust_items
-	 where (document_type = 'dg' or 
-		   document_type = 'dr') and 
+	 where (document_type = 'dg' or
+		   document_type = 'dr') and
 		   posting_date between eomonth(dateadd(month,-12,key_date)) and key_date)
 
-select * into #temp_sum 
+select * into #temp_sum
 from sum_sales
 
-select * into #temp_cust 
-from o2c.tp1_customer 
+select * into #temp_cust
+from o2c.tp1_customer
 where customer_number = credit_account;
 
 with del_cust_duplicates as (
-    select 
+    select
         *,
         row_number() over (
-            partition by 
+            partition by
 				credit_account
-            order by 
+            order by
 				credit_account,
-				company_code 
+				company_code
         ) row_num
-     from 
+     from
         #temp_cust
 )
 
 delete from del_cust_duplicates
 where row_num > 1
 
-select od.credit_account, 
-	   od.key_date, 
-	   od.[1-30], 
-	   od.[31-90], 
+select od.credit_account,
+	   od.key_date,
+	   od.[1-30],
+	   od.[31-90],
 	   od.[90+],
 	   od.[not_due],
-	   su.sales_by_ca, 
+	   su.sales_by_ca,
 	   cust.credit_limit,
 	   cust.credit_reporting_group,
 	   cust.customer_country,
@@ -2359,47 +2471,47 @@ select od.credit_account,
 	   cust.trading_partner,
 	   cust.credit_block
 into o2c.sta_payment_behavior
-from #temp_od as od 
-	left join 
-	#temp_sum as su on 
-	od.credit_account = su.credit_account 
-	left join 
-	#temp_cust as cust on 
+from #temp_od as od
+	left join
+	#temp_sum as su on
+	od.credit_account = su.credit_account
+	left join
+	#temp_cust as cust on
 	right('0000000000' + convert(varchar(10),od.credit_account), 10) = cust.credit_account
 
 drop table if exists #temp_od
-drop table if exists #temp_sum 
+drop table if exists #temp_sum
 drop table if exists #temp_cust
 
 end
 ```
 #### STA_*SCHEMA
 
-Every STA_* table also has a corresponding SCHEMA table. This is necessary for business to speed up the mapping process in SAC. 
+Every STA_* table also has a corresponding SCHEMA table. This is necessary for business to speed up the mapping process in SAC.
 
-## Transport Changes from D-System to P-System 
+## Transport Changes from D-System to P-System
 
-There is no automated transport link between D-SQL and P-SQL. Therefore the changes need to be transported by hand. 
+There is no automated transport link between D-SQL and P-SQL. Therefore the changes need to be transported by hand.
 
-> In order to avoid mistakes I would recommend in case of a bigger change to just delete all stored procedures from P-System and Create all D-System Procedures again 
+> In order to avoid mistakes I would recommend in case of a bigger change to just delete all stored procedures from P-System and Create all D-System Procedures again
 
 ![](2021-04-15-10-13-13.png)
 
-This can be done with the generate script function in the SQL Server. Tables, procedures and functions can be exported and then be run in the P-System. 
+This can be done with the generate script function in the SQL Server. Tables, procedures and functions can be exported and then be run in the P-System.
 
-# SAP Analytics Cloud 
+# SAP Analytics Cloud
 
 ![](2021-04-15-13-33-32.png)
 
-## File Server 
+## File Server
 
 ![](2021-04-14-11-19-27.png)
 
-The STA_* Models are printed into the OUTPUT Folder on the SAC FIle Server. 
+The STA_* Models are printed into the OUTPUT Folder on the SAC FIle Server.
 
 ![](2021-04-14-11-22-03.png)
 
-INPUT contains all the Excel information that is imported during the INGEST step in Data Factory 
+INPUT contains all the Excel information that is imported during the INGEST step in Data Factory
 
 ![](2021-04-14-11-22-57.png)
 
@@ -2419,9 +2531,9 @@ Currenctly the STA_* tables map to the following models:
 |  STA_IRB_FULL |  POC_INVOICES_IRB |
 |STA_OPEN_ITEMS| PAYMENTS_OPEN_ITEMS|
 |STA_ALL_ITEMS| PAYMENTS_ALL_ITEMS|
-|STA_IRB_MONTHLY | INVOICES_IRB_SNAP| 
-|STA_OPEN_CUST_ITEMS | OPEN ITEMS NEW AR MODEL| 
-|STA_EFLOW_CLR|E-FLOW NEW CLR MODEL| 
+|STA_IRB_MONTHLY | INVOICES_IRB_SNAP|
+|STA_OPEN_CUST_ITEMS | OPEN ITEMS NEW AR MODEL|
+|STA_EFLOW_CLR|E-FLOW NEW CLR MODEL|
 |STA_EFLOW_LIKP |E-FLOW NEW DN MODEL|
 |STA_FI1000| DSO & OVERDUE RATE BW REPOT|
 |STA_ALL_CUST_ITEMS | ALL ITEMS NEW AR MODEL|
@@ -2450,7 +2562,7 @@ AP Processing and DP
 ![](2021-04-15-14-01-22.png)
 <br>
 
-AP Invoice Receiving and Posting 
+AP Invoice Receiving and Posting
 ![](2021-04-15-14-02-43.png)
 <br>
 ![](2021-04-15-14-04-17.png)
@@ -2476,7 +2588,7 @@ AP Invoice Receiving and Posting
 ![](2021-04-15-14-18-31.png)
 <br>
 
-AP Overdue Items 
+AP Overdue Items
 ![](2021-04-15-14-19-23.png)
 <br>
 ![](2021-04-15-14-21-47.png)
@@ -2486,7 +2598,7 @@ AP Overdue Items
 ![](2021-04-15-14-23-44.png)
 <br>
 
-Intercompany & Payments 
+Intercompany & Payments
 ![](2021-04-15-14-32-03.png)
 <br>
 ![](2021-04-16-10-39-24.png)
@@ -2495,7 +2607,7 @@ Intercompany & Payments
 <br>
 ![](2021-04-16-10-41-48.png)
 
-Credit Management 
+Credit Management
 ![](2021-04-16-10-43-55.png)
 <br>
 ![](2021-04-16-10-45-23.png)
@@ -2505,7 +2617,7 @@ Credit Management
 ![](2021-04-16-11-01-13.png)
 
 
-# Monitoring 
+# Monitoring
 
 ![](2021-04-16-11-37-12.png)
 
@@ -2523,36 +2635,36 @@ Credit Management
 
 ## Data Flow
 
-The pipelines are currently running on a weekly basis through below schema: 
+The pipelines are currently running on a weekly basis through below schema:
 
 ![](2021-04-14-14-51-08.png)
 
 | Step  |Time   |Contact Person|
 |---|---|---|
 | Export Data from EP1  | Sundays   | Regin, Norbert / Horvat, Radu Claudiu  |
-|Importing data from EP1 and EFLOW to data lake| Tuesdays| Mandeep, Kaur| 
-|Running Pipeline in Data Factory | Thursday| Wang, Yanhu | 
+|Importing data from EP1 and EFLOW to data lake| Tuesdays| Mandeep, Kaur|
+|Running Pipeline in Data Factory | Thursday| Wang, Yanhu |
 |Importing data to SAC| Thursday | Shen, Jie / Bao, Jianxin|  
 
-## Flow Date Tracking 
+## Flow Date Tracking
 
-### Export data from EP1 
+### Export data from EP1
 
-This is the most important data as business needs to know when the SAP data was exported from EP1. Therefore it is tracked through the whole pipeline. 
+This is the most important data as business needs to know when the SAP data was exported from EP1. Therefore it is tracked through the whole pipeline.
 
-There is a table called e-dlk-uebersicht-ladedatum which tracks the export time from SAP. 
+There is a table called e-dlk-uebersicht-ladedatum which tracks the export time from SAP.
 
 ![](2021-04-14-15-01-11.png)
 
-This table is part of the dataflows for both o2c and p2p. 
+This table is part of the dataflows for both o2c and p2p.
 
 ![](2021-04-14-15-02-09.png)
 
-It is then saved in the ing_load_details tables in dbo and o2c schema. 
+It is then saved in the ing_load_details tables in dbo and o2c schema.
 
 ![](2021-04-14-15-04-12.png)
 
-In every CLN_* procedure it is then updated for each table: 
+In every CLN_* procedure it is then updated for each table:
 
 ```SQL
 alter procedure [dbo].[p_cln_bsak] as
@@ -2563,7 +2675,7 @@ from cln_load_details as src
 where table_name = 'bsak'
 ```
 
-In the SAT tables it is then populated finally as src_download_date and loaded into SAC: 
+In the SAT tables it is then populated finally as src_download_date and loaded into SAC:
 
 ![](2021-04-14-15-11-12.png)
 
@@ -2573,19 +2685,19 @@ This date can be tracked in the table e-dlk-uebersicht-ladedatum too but we don'
 
 ### Running Pipeline in Data Factory
 
-Every Flow populates the download date as a last step: 
+Every Flow populates the download date as a last step:
 
-![](2021-04-14-15-14-13.png) 
+![](2021-04-14-15-14-13.png)
 
-For BW reports it is added in the copy data step: 
+For BW reports it is added in the copy data step:
 
 ![](2021-04-14-15-17-30.png)
 
-This way we can check in SQL server when the data in the table was last downloaded: 
+This way we can check in SQL server when the data in the table was last downloaded:
 
 ![](2021-04-14-15-15-20.png)
 
-It is then populated along with the src_download date and can be found in SAC too: 
+It is then populated along with the src_download date and can be found in SAC too:
 
 ![](2021-04-14-15-16-12.png)
 
@@ -2597,47 +2709,47 @@ For every Model an import job from the file server is setup weekly:
 
 The job can be refreshed manually as well by hitting the Refresh button. THe scheduling can be changed by clicking the calendar button.  
 
-On the right side the last imports are displayed. If there are two files merged it is also showing here: 
+On the right side the last imports are displayed. If there are two files merged it is also showing here:
 
 ![](2021-04-14-14-23-52.png)
 
-In this case the OPEN ITEMS NEW AR MODEL is containing the main file (STA_OPEN_CUST_ITEMS) and an additional file from the Excel Upload folder: 
+In this case the OPEN ITEMS NEW AR MODEL is containing the main file (STA_OPEN_CUST_ITEMS) and an additional file from the Excel Upload folder:
 
 ![](2021-04-14-14-25-40.png)
 
-The mapping of the model from the basefile can be checked here: 
+The mapping of the model from the basefile can be checked here:
 
 ![](2021-04-14-14-29-05.png)
 
-Additional calculations that are done in the model can be checked here as well. They will appear on the right side of the screen. 
+Additional calculations that are done in the model can be checked here as well. They will appear on the right side of the screen.
 
 ## Compare Q-D System
 
-Changes should be implemented in the test system first and then transported to the P-System. We need a way to quickly track how after the change the row counts in the SQL Server changed to verify if the development is successful. 
+Changes should be implemented in the test system first and then transported to the P-System. We need a way to quickly track how after the change the row counts in the SQL Server changed to verify if the development is successful.
 
-In order to do this the metadata (columncount and rowcount) for each table is written down in another table called metadata: 
+In order to do this the metadata (columncount and rowcount) for each table is written down in another table called metadata:
 
 ![](2021-04-14-15-31-53.png)
 
 ![](2021-04-14-15-33-40.png)
 
-As the d-system and p-system are completely different SQL Servers it's not easy to compare the metadata tables from Q and P-System directly. We built a small Power BI Dashboard that can automatically pull data from both Q and P for comparison: 
+As the d-system and p-system are completely different SQL Servers it's not easy to compare the metadata tables from Q and P-System directly. We built a small Power BI Dashboard that can automatically pull data from both Q and P for comparison:
 
 ![](2021-04-14-15-36-01.png)
 
-This way it's easy to double check how wether the change had unwanted impact on other tables. 
+This way it's easy to double check how wether the change had unwanted impact on other tables.
 
-## Pipeline runs 
+## Pipeline runs
 
-The overall pipeline runs can easily be tracked in 
+The overall pipeline runs can easily be tracked in
 
 # Frequent Questions / Issues / Requests
 
 ## Requests
 
-### We (Business) want to add a new column to model X 
+### We (Business) want to add a new column to model X
 
-There are 3 options to do this: 
+There are 3 options to do this:
 
 1. Create a new SAC Model and Link the data in the story
 	![](2021-04-15-09-40-09.png)
@@ -2646,14 +2758,14 @@ There are 3 options to do this:
 	++ Can link data from another context (e.g. Actual model and Target model)
 
 	-- Functionality for calculations limited
-	-- Clunky /Strange errors sometimes 
+	-- Clunky /Strange errors sometimes
 	-- Business has to manually maintain the data
 	<br>
-2. Add the data in the SAC Model via the Upload Excel folder on the SAC Fileserver 
+2. Add the data in the SAC Model via the Upload Excel folder on the SAC Fileserver
 
 	![](2021-04-15-09-44-36.png)
 
-2.1 Business needs to add new column to model. 
+2.1 Business needs to add new column to model.
 
 ![](2021-04-15-09-57-40.png)
 
@@ -2661,36 +2773,36 @@ There are 3 options to do this:
 
 ![](2021-04-15-09-58-45.png)
 
-2.3 Business will import the data and do a new mapping for the changed import file 
+2.3 Business will import the data and do a new mapping for the changed import file
 
-2.4 Run the OUTPUT pipeline to print the full data model to the SAC Fileserver 
+2.4 Run the OUTPUT pipeline to print the full data model to the SAC Fileserver
 
-2.5 Business now imports the full data and double checks the change 
+2.5 Business now imports the full data and double checks the change
 
-	++ Business can do the change themselves 
-	++ Has full functionality of SAC later on 
-	
-	-- More conplexity in the model 
-	-- Business has to maintain data manually 
+	++ Business can do the change themselves
+	++ Has full functionality of SAC later on
 
-3. Add the column into SQL Server 
-> I would always recommend to do option 1 or 2 first as a blueprint until the business case is clear and then automate on the SQL server afterwards. This avoids a lot of friction between IT and Business. 
+	-- More conplexity in the model
+	-- Business has to maintain data manually
 
-3.1 check with business where the information is stored and then start from there. 
-If the information is not on data lake yet we need to request it from HQ first and schedule it to be loaded. 
+3. Add the column into SQL Server
+> I would always recommend to do option 1 or 2 first as a blueprint until the business case is clear and then automate on the SQL server afterwards. This avoids a lot of friction between IT and Business.
 
-3.2 After this is done or if it is already available the ingest pipeline must be adjusted e.g. 
+3.1 check with business where the information is stored and then start from there.
+If the information is not on data lake yet we need to request it from HQ first and schedule it to be loaded.
+
+3.2 After this is done or if it is already available the ingest pipeline must be adjusted e.g.
 
 ![](2021-04-15-09-52-27.png)
 
-Here we are adding a new column from BKPF table to be downloaded to SQL Server 
+Here we are adding a new column from BKPF table to be downloaded to SQL Server
 
-3.3 Add new column in the SQL tables of D-SQL-Server 
-Some tables are generated automatically here we don't need to add additional columns. Some tables need to be created statically like the STA_* tables and indexed tables. Here we need to add the coding. 
+3.3 Add new column in the SQL tables of D-SQL-Server
+Some tables are generated automatically here we don't need to add additional columns. Some tables need to be created statically like the STA_* tables and indexed tables. Here we need to add the coding.
 
-> Best way is to run the pipeline and see where it is interrupted and then add the coding there. For STA_* tables we always need to add the new column manually as this will change the output to SAP and requires new mapping by business 
+> Best way is to run the pipeline and see where it is interrupted and then add the coding there. For STA_* tables we always need to add the new column manually as this will change the output to SAP and requires new mapping by business
 
-3.4 Business needs to add new column to model. 
+3.4 Business needs to add new column to model.
 
 ![](2021-04-15-09-57-40.png)
 
@@ -2698,65 +2810,65 @@ Some tables are generated automatically here we don't need to add additional col
 
 ![](2021-04-15-09-58-45.png)
 
-3.6 Business will import the data and do a new mapping for the changed import file 
+3.6 Business will import the data and do a new mapping for the changed import file
 
-3.7 Run the OUTPUT pipeline to print the full data model to the SAC Fileserver 
+3.7 Run the OUTPUT pipeline to print the full data model to the SAC Fileserver
 
-3.8 Business now imports the full data and double checks the change 
+3.8 Business now imports the full data and double checks the change
 
-3.9 Transfer the coding to P-System. Check the chapters for transports above. 
+3.9 Transfer the coding to P-System. Check the chapters for transports above.
 
-++ Fully Automated 
-++ Can fulfill all requirements 
+++ Fully Automated
+++ Can fulfill all requirements
 
--- IT effort 
+-- IT effort
 
-### Add new BW cube to Solution Space 
+### Add new BW cube to Solution Space
 
 
 # Issues
 ## We (Business) want to add a new calculated dimension but in SAC we get the following error
 
 ![](2021-04-15-10-18-39.png)
-  
-SAC seems to have problems if the calculated dimensions are created on dimensions with a lot of different member values. e.g. this error will appear when creating calculated dimensions on the text column as every row has a different value in the field. It will most likely not appear for a calculated dimension on the company code as there are only 10 differnt members. 
 
-There are two options to solve this. 
+SAC seems to have problems if the calculated dimensions are created on dimensions with a lot of different member values. e.g. this error will appear when creating calculated dimensions on the text column as every row has a different value in the field. It will most likely not appear for a calculated dimension on the company code as there are only 10 differnt members.
 
-1. Add the calculation into the model 
+There are two options to solve this.
+
+1. Add the calculation into the model
 
 ![](2021-04-15-10-25-34.png)
 
 
-1.1 Business needs to add new column to model. 
+1.1 Business needs to add new column to model.
 
 1.2 Run the SCHEMA pipeline to print only the first 500 rows of the model
 
 1.3 Business will import the data and add the new calculation
 
-1.4 Run the OUTPUT pipeline to print the full data model to the SAC Fileserver 
+1.4 Run the OUTPUT pipeline to print the full data model to the SAC Fileserver
 
-1.5 Business now imports the full data and double checks the change 
+1.5 Business now imports the full data and double checks the change
 
-++ Change can be done by business themselves 
+++ Change can be done by business themselves
 -- Increases complexity of the model
 
-2. Add the calculation into the SQL Server 
+2. Add the calculation into the SQL Server
 
-2.1 add the calculation in the TP3_* stage on the SQL server. There are already many examples: 
+2.1 add the calculation in the TP3_* stage on the SQL server. There are already many examples:
 
-```SQL 
+```SQL
 update o2c.tp3_all_cust_items set vat_issued = 'VAT issued' where left(REFERENCE,3) = 'INV'
 ```
 
 2.2 Add the new column to the STA_* tables needed
 
-2.3 Follow steps 1.1 - 1.5 froma above 
+2.3 Follow steps 1.1 - 1.5 froma above
 
-++ can fulfill all business requirements 
--- IT effort 
+++ can fulfill all business requirements
+-- IT effort
 
-> Again it makes sense to do option 1 first and then move all the additonal calculations to the SQL server once there are a couple of them accumulated in the SAC model 
+> Again it makes sense to do option 1 first and then move all the additonal calculations to the SQL server once there are a couple of them accumulated in the SAC model
 
 
 ## Business thinks that the data is wrong
