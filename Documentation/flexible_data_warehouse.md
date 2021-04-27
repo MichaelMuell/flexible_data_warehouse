@@ -3,8 +3,6 @@
 
 <!-- code_chunk_output -->
 
-![fNNhSC4UET](/assets/fNNhSC4UET_qaau08fxx.png)
-
 - [Introduction & Remarks](#introduction-remarks)
 - [The Framework for Business Process Improvement](#the-framework-for-business-process-improvement)
   - [The dashboard that shows just numbers misses the point.](#the-dashboard-that-shows-just-numbers-misses-the-point)
@@ -206,7 +204,28 @@ All actions coming from the insights must be captured and followed up outside th
 
 #Designing an IT system to optimally support Business Process Improvement
 
-## Current System Landscape
+## Current System Landscape and it's Users
+
+![2021-04-09-11-14-12](/assets/2021-04-09-11-14-12.png)
+
+the image above shows in a very simple way the groups that consume reporting, the frequency reporting is needed by them and the different tools that are used to do that. Each Layer has different requirements on how they deal with data and the way it is consumed.
+
+Operational Reporting:
+This is the reporting layer used by specialists on a day-to-day basis to verify the daily operations and smoothness of processes in the systems. Questions that a reporting system in this layer needs to answer are e.g.:
+
+1. Have all invoices been posted?
+2. Have all goods been sent out to the customer?
+3. Are there any processing errors?
+
+The focus for this kind of reporting lies on actuality of the data. This layer is also the only kind of reporting that justifies the struggle of real-time view on processes on the system. 
+
+Gladly, a reporting on daily basis does not have deep analysis requirements as time is usually too short to spend much of day on analysis
+
+Core KPI Layer:  
+The Core KPI Layer is classified by
+
+Gartner KPI Layers raussuchen.
+
 
 ## Differences between Core KPI Layer and Flexible KPI Layer
 
