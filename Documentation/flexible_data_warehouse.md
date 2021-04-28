@@ -4,6 +4,10 @@
 <!-- code_chunk_output -->
 
 - [Introduction & Remarks](#introduction-remarks)
+  - [Important](#important)
+  - [Chapter1:](#chapter1)
+  - [Chapter2:](#chapter2)
+  - [Chapter3:](#chapter3)
 - [The Framework for Business Process Improvement](#the-framework-for-business-process-improvement)
   - [The dashboard that shows just numbers misses the point.](#the-dashboard-that-shows-just-numbers-misses-the-point)
   - [The main job of the middle manager is process optimization.](#the-main-job-of-the-middle-manager-is-process-optimization)
@@ -13,10 +17,14 @@
   - [CHECK / Were the actions successful?](#check-were-the-actions-successful)
   - [How to improve even more!](#how-to-improve-even-more)
 - [Designing an IT system to optimally support Business Process Improvement](#designing-an-it-system-to-optimally-support-business-process-improvement)
-  - [Current System Landscape](#current-system-landscape)
-  - [Differences between Core KPI Layer and Flexible KPI Layer](#differences-between-core-kpi-layer-and-flexible-kpi-layer)
-  - [Different Needs for a flexible Data Warehouse](#different-needs-for-a-flexible-data-warehouse)
-  - [Implementation Principles to fulfill them](#implementation-principles-to-fulfill-them)
+  - [Current System Landscape and it's Users](#current-system-landscape-and-its-users)
+    - [Operational Reporting:](#operational-reporting)
+    - [Core KPI Layer](#core-kpi-layer)
+    - [Agile KPI Layer](#agile-kpi-layer)
+  - [The](#the)
+  - [The best practice solution architecture](#the-best-practice-solution-architecture)
+    - [Changeability & Extendability by Business](#changeability-extendability-by-business)
+    - [Short Development Cycles](#short-development-cycles)
 - [Implementation of the flexible data Warehouse](#implementation-of-the-flexible-data-warehouse)
   - [Systems](#systems)
     - [Data Factory](#data-factory)
@@ -102,6 +110,31 @@
 
 
 # Introduction & Remarks
+
+The following whitepaper of the flexible data warehouse is a documentation of the business background (chapter 1), implementation concepts(chapter 2) and the actual implementation (chapter 3) of a project with the goal to gain insights into the business processes of a Shared Service Center, identify issues and solve them. This constant process improvement would then inevitably lead to cost saving that can be tracked by the increase of automation KPI.
+
+##Important
+
+The knowledge that led to this document was not accumulated step by step in a waterfall fashion like it is written down, but rather through many iterations of try & error.
+
+The principles in chapter2 where written down AFTER actually implementing them implicitly through many iterations which makes them more valuable as they are tested and seem to work great in a real world application.
+
+##Chapter1:
+Explains the use case from business perspective. It is the summary of many discussion together with the finance department of the company and lays the foundation for the solution design.
+
+> Especially if you're an IT guy like me this is a MUST read. Because we are fascinated by technology we are all to often excited by flashy charts, AI analysis and Demo videos. It is crucial to understand that just because something is technically possible does not mean it is useful. The chapter shines a light on how business sees things.
+
+##Chapter2:
+
+This chapter builds on top of the first and discusses the necessity of a different approach for the flexible KPI layer.
+
+##Chapter3:
+
+This chapter is proof that this document is not just a consulting company slide-(shit)-show.
+
+Through the last year we implemented the flexible data warehouse described in chapter two. It has two purposes. Firstly, be a maintenance guide to quickly lookup errors once they occur. Therefore we included an FAQ part. Secondly, it shows the exact implementation steps and our thinking behind it to give a starting point for new use cases or extensions.
+
+The coding samples do not include all coding but only the building blocks to give you an idea of how these principles can be implemented. The code does not claim to be perfect but functional.
 
 #The Framework for Business Process Improvement
 
@@ -206,36 +239,153 @@ All actions coming from the insights must be captured and followed up outside th
 
 ## Current System Landscape and it's Users
 
-![2021-04-09-11-14-12](/assets/2021-04-09-11-14-12.png)
+![eea1KKvyuf](/assets/eea1KKvyuf.png)
 
-the image above shows in a very simple way the groups that consume reporting, the frequency reporting is needed by them and the different tools that are used to do that. Each Layer has different requirements on how they deal with data and the way it is consumed.
+the image above shows in a very simple way the groups that consume reporting and the frequency reporting is needed by them. Each Layer has different requirements on how they deal with data and the way it is consumed.
 
-Operational Reporting:
+###Operational Reporting:
 This is the reporting layer used by specialists on a day-to-day basis to verify the daily operations and smoothness of processes in the systems. Questions that a reporting system in this layer needs to answer are e.g.:
 
 1. Have all invoices been posted?
 2. Have all goods been sent out to the customer?
 3. Are there any processing errors?
 
-The focus for this kind of reporting lies on actuality of the data. This layer is also the only kind of reporting that justifies the struggle of real-time view on processes on the system. 
+The focus for this kind of reporting lies on actuality of the data. This layer is also the only kind of reporting that justifies the struggle of real-time view on processes on the system.
 
-Gladly, a reporting on daily basis does not have deep analysis requirements as time is usually too short to spend much of day on analysis
+Gladly, a reporting on daily basis does not have deep analysis requirements as time is usually too short to spend much of the day on analysis. Therefore a quick reporting is usually setup in the system where the action is performed.
 
-Core KPI Layer:  
-The Core KPI Layer is classified by
+Summary Operational Reporting:
+- Fast
+- Stable
+- Easy
+- Source System capability
 
-Gartner KPI Layers raussuchen.
+###Core KPI Layer
 
+The Core KPI Layer (yellow) is classified as containing the top KPI that are necessary to run the company. These KPI are crucial and must be compareable over long periods of time as decisions that are made at this level are strategic and take time to show their impact in the actual data.
 
-## Differences between Core KPI Layer and Flexible KPI Layer
+A system that produces these figures must be stable, reliable and able to deal with huge amounts of data. These requirements cause the system to necessarily have long development cycles and other load restrictions due to the huge amount of data.
 
-## Different Needs for a flexible Data Warehouse
+Traditionally most companies have a sophisticated data warehouse solution in place that deals with the core KPI layer requirements. As described in chapter 1 it's usually the Controllers Job to find and prepare the important data points in a meaningful way and present them to the top management.
 
-## Implementation Principles to fulfill them
+Summary Core KPI Layer:
+
+- Stable
+- Reliable
+- Long Development Cycles
+- Huge Volumes of Data
+- Business Warehouse system and Controllers job
+
+###Agile KPI Layer
+
+The Agile KPI Layer(green) contains all the error analysis, reporting and nitty gritty that the middle manager needs to run the business under his responsibility. The insights that a middle manager wants to derive from data are more on the short term but therefore need to be more flexible than the requirements of top management and data volumes needed are smaller but need to be more detailed.
+
+Traditionally companies rely on the swiss army knife of software: Excel.
+
+Summary Agile KPI Layer:
+
+- Flexible
+- Short development Cycles
+- Small / Mid size volumes of data
+- Excel
+
+## The Gap to Close
+
+What we see is that from the three reporting layers it's the agile KPI layer that is the one with the least software support. This is mostly because this space is the newest. Previously Excel and operational reports were just enough to handle those requirements. However, the increase in data that is collected and the decentralization of tasks in a Shared Service Center make it less and less feasible to handle these tasks in Excel.
+
+Furthermore, computing and storage cost have decreased tremendously over the last years turning the cost benefit analysis in favor of an automated solution in many more cases. These developments lead to a widening gap that is not adapted by many companies today.  
+
+## The best practice solution architecture
+
+The first thought of just increasing Operational Reporting capability or building more Data Warehouse reports falls short looking at the very different nature of the agile KPI layer.
+
+The show stopper for integrating the agile requirements into the core KPI layer are the long development cycles and amount of IT effort involved for their development.
+
+The operational Reporting falls short in the source systems capabilities for advanced analysis. Additionally a source system reporting only allows insight into the data that is managed in that specific source system. Oftentimes insights are gained by combining data from many data sources along the process.
+
+![](2021-04-14-14-51-08.png)
+
+In the image you see the final architecture of the flexible warehouse.
+
+1. Data is initially exctracted from many different source systems. In our case this is our SAR R3 System EP1, an SAP BW system that sits on top of the SAP R3 System, an external Business Workflow system called EFLOW and additional excel files that contain additional business logic or report downloads from other software that is not yet automatically connected
+
+2. Data is extracted from the SAP EP1 system and EFLOW system on a weekly schedule into the company data lake
+
+3. With the help of microsoft azure data factory the data from data lake, BW and Excel can be accessed.
+
+4. A data warehouse is setup in the Azure SQL Server that executes ETL functions and adds business logic where necessary.
+
+5. The result of this transformation are data model tables that can be accessed by BI tools like SAP Analytics Cloud or Microsoft Power BI.
+
+Let's have a look at the advantages and trade offs that this architecture makes to make it a much better fit for the agile KPI Layer and fulfills the requirements for agility while providing automation that allows for deep root cause analysis
+
+### Changeability & Extendability by Business
+
+![Inked2021-04-14-14-51-08_LI](/assets/Inked2021-04-14-14-51-08_LI.jpg)
+
+In order to achieve that we have to first transfer the knowledge of how to design and build dashboards and reports with self service BI tools to business. This gives them all the freedom they had with Excel while automating the data preparation and later the consumption of the report. Everything in the presentation area is business responsibility (right to the green line)
+
+This is only possible through hands on training and persistence as it takes a while to get through the highs and lows of adapting to new technology.
+
+In our experience around 90% of business logic and KPI can be calculated on the fly in the BI tool and are therefore under complete control of the business department, that can change them in self service manner if needed. Contrary to a BW system where the business logic is calculated in the reporting cube and setup by IT.
+
+The second requirement of change is adding additional data or dimensions. This is achieved through the fact that each model table can be merged with additional data that is manually added and then joined. This way, business can quickly add addtional dimensions.
 
 ![](2021-04-09-11-14-55.png)
 
-![](2021-04-09-11-15-21.png)
+These two types of change we call Type 1 changes. They are characterized by high flexibility, easiness and **don't involve any IT staff** Business can try out new ideas and additional requirements his way. There is a trad-off in that these type1 changes increase complexity for business to handle and also decrease automation as the additional files must be handled manually.
+
+Because of that there is another change we call Type 2 change. A Type 2 change is always preceded by a Type1 change that serves as blueprint for the type 2 change. What this means is that it basically moves the data source further back in the pipeline to automate the extraction and processing.
+
+![InkedInked2021-04-14-14-51-08_LI](/assets/InkedInked2021-04-14-14-51-08_LI.jpg)
+
+This will increase the automation and decrease the complexity as the processing is now handled automatically in the pipeline. However, this involves IT effort and additional testing of all affected data streams.
+
+handling changes in this manner also decreases friction between Business and IT department where business fails to describe exactly what they want (IT perspective :) ) or IT fails to understand the business idea (Business perspective :) ) as the type1 change serves as blueprint.
+
+Optimally many Type1 changes are combined into one bigger Type2 change as testing and implementation effort can be reduced significantly this way.
+
+As below shown as business value created by changes over time
+
+![2021-04-09-11-15-21](/assets/2021-04-09-11-15-21.png)
+
+### Short Development Cycles
+
+Short development cycles are achieved by decreasing complexity. One big part of that is the change strategy introduced in the previous chapter. It enables leaving business logic to business.
+
+There are several other design principles that ensure short development cycles.
+
+**The more frequently a logic / procedure changes, the closer to the end it should be put in the pipeline**
+
+In our case this means the following:
+
+![Inked2021-04-14-14-51-08_LI](/assets/Inked2021-04-14-14-51-08_LI_mgw783w7n.jpg)
+
+Until the green line there is no logic whatsoever. The tables from the source systems are loaded completely and without any delta update logic. Contrary to a BW solution this is possible because storage and compute power are cheap and the data volume is not that high.
+
+Until the orange line the data is filtered by very high level case specifics. E.G. Data from Chinese Entities.
+
+Until the blue line general ETL functions are executed on the data. There is still no specific logic
+
+Until the red line tables are prepared only into their natural objects. e.g. SAP Invoice, Credit Line Workflow etc.
+
+Only after the red line business logic and frequently changing transformations are added.
+
+This layered approach keeps the core stable and easy and allows for more frequent change. The changes can be made most of the time without touching anything behind the red line. The only exception being big Type2 changes.
+
+**Avoid storage tables completely**
+
+In the flexible data warehouse ALL tables should be completely recreated with each pipeline run. This allows us to add additional columns and calculations without having to worry about any legacy data.
+
+I'll say it again because this is huge! In the flexible data warehouse we don't have to worry about any legacy data!
+
+This means that we don't have to write complex update routines for our tables or manually add legacy columns after we downloaded them. There are no slowly changing dimensions needed to be taken care of.
+
+This eliminates the biggest source of errors and manual work in the development cycle and is the biggest difference compared to the classic BW system where complex delta updates are setup. This is partly because in the past it was necessary and partly because the data is used is huge.
+
+The tradeoff in that case is less manual work and higher stability for accuracy. If legacy data is changed in the source system it is also changed in our flexible data warehouse. If a supplier name is changed it is also changed for all legacy data under that supplier number.
+
+In the flexible warehouse we are very willing to take this tradeoff. For the core KPI layer it might be a different discussion.
 
 #Implementation of the flexible data Warehouse
 
@@ -2654,7 +2804,7 @@ Credit Management
 
 ## Data Flow
 
-The pipelines are currently running on a weekly basis through below schema:
+The pipelines are currently running on a weekly basis through below architeture:
 
 ![](2021-04-14-14-51-08.png)
 
