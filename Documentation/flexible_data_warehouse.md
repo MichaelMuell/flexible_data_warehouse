@@ -21,7 +21,7 @@
     - [Operational Reporting:](#operational-reporting)
     - [Core KPI Layer](#core-kpi-layer)
     - [Agile KPI Layer](#agile-kpi-layer)
-  - [The](#the)
+  - [The Gap to Close](#the-gap-to-close)
   - [The best practice solution architecture](#the-best-practice-solution-architecture)
     - [Changeability & Extendability by Business](#changeability-extendability-by-business)
     - [Short Development Cycles](#short-development-cycles)
@@ -111,30 +111,34 @@
 
 # Introduction & Remarks
 
-The following whitepaper of the flexible data warehouse is a documentation of the business background (chapter 1), implementation concepts(chapter 2) and the actual implementation (chapter 3) of a project with the goal to gain insights into the business processes of a Shared Service Center, identify issues and solve them. This constant process improvement would then inevitably lead to cost saving that can be tracked by the increase of automation KPI.
+The following whitepaper of the flexible data warehouse is a documentation of the business background (chapter 1), implementation concepts(chapter 2), and the actual implementation (chapter 3) of a project to gain insights into the business processes of a Shared Service Center. The solution enables effective process improvement, inevitably leading to cost savings that the automation KPI can track.
 
 ##Important
 
 The knowledge that led to this document was not accumulated step by step in a waterfall fashion like it is written down, but rather through many iterations of try & error.
 
-The principles in chapter2 where written down AFTER actually implementing them implicitly through many iterations which makes them more valuable as they are tested and seem to work great in a real world application.
+We wrote down the principles contained in chapter2 AFTER actually implementing them implicitly through many iterations. That makes them more valuable as they are tested and seem to work great in a real-world application.
 
 ##Chapter1:
-Explains the use case from business perspective. It is the summary of many discussion together with the finance department of the company and lays the foundation for the solution design.
+Explains the use case from a business perspective. It is the summary of many discussions with the company's finance department and lays the foundation for the solution design.
 
-> Especially if you're an IT guy like me this is a MUST read. Because we are fascinated by technology we are all to often excited by flashy charts, AI analysis and Demo videos. It is crucial to understand that just because something is technically possible does not mean it is useful. The chapter shines a light on how business sees things.
+Especially if you're an IT guy like me, this is a MUST read. Because we are fascinated by technology, we are all too often excited by flashy charts, AI analysis, and Demo videos.
+
+**It is crucial to understand that just because something is technically possible does not mean it is valuable**.
+
+The chapter shines a light on how business sees things.
 
 ##Chapter2:
 
-This chapter builds on top of the first and discusses the necessity of a different approach for the flexible KPI layer.
+This chapter builds on top of the first, discusses the necessity of a different approach for the agile KPI layer, and presents a working solution for its implementation. The chapter highlights the chosen architecture and outlines the benefits of the classic data warehouse and operational reporting.
 
 ##Chapter3:
 
 This chapter is proof that this document is not just a consulting company slide-(shit)-show.
 
-Through the last year we implemented the flexible data warehouse described in chapter two. It has two purposes. Firstly, be a maintenance guide to quickly lookup errors once they occur. Therefore we included an FAQ part. Secondly, it shows the exact implementation steps and our thinking behind it to give a starting point for new use cases or extensions.
+Through the last year, we implemented the flexible data warehouse described in chapter two. The chapter has two purposes. Firstly, be a maintenance guide to quickly lookup errors once they occur. Secondly, it shows the exact implementation steps and our thinking behind it to give a starting point for new use cases or extensions.
 
-The coding samples do not include all coding but only the building blocks to give you an idea of how these principles can be implemented. The code does not claim to be perfect but functional.
+The coding samples do not include all coding but only the building blocks to explain how you can implement these principles. The code does not claim to be perfect but functional.
 
 #The Framework for Business Process Improvement
 
@@ -161,9 +165,7 @@ Process optimization is a multi-step process. Depending on your source, the numb
 3. Define actions and execute them
 4. Check if the actions were successful
 
-
-
-image 1–1 by the author
+![P27mSb7fpB](/assets/P27mSb7fpB.png)
 
 The managers’ success is measured mainly by this task. That is correct in most cases as he is usually receiving a bonus based on how well the KPIs under his responsibility perform over a given period. Our goal is to design an information system to support him with this task. The best way to do that is to help him answer the main questions related to each step based on the data we have:
 
@@ -178,16 +180,16 @@ Let’s have a look at how a more sophisticated solution could answer these ques
 
 ##IDENTIFY / Is There a Problem?
 
-image 2–1 by the author
+![2021-04-15-14-01-22](/assets/2021-04-15-14-01-22.png)
 
-In this screenshot, you can see the classic dashboard that usually gets printed on marketing materials. The actual numbers of last period’s KPI were placed on top. Below you can see the trend over the previous months. If the KPI crosses a certain threshold, it turns green/red to indicate whether the result got better or worse than last month. For each KPI, you can jump to the root cause analysis by double-clicking.
+In this screenshot, you can see the classic dashboard that usually gets printed on marketing materials. The actual numbers of last period’s KPI were placed on the left. Below you can see the trend over the previous months. If the KPI crosses a certain threshold, it turns green/red to indicate whether the result got better or worse than last month. For each KPI, you can jump to the root cause analysis by double-clicking.
 
 ##ANALYZE / What Caused the Problem?
 The main idea is that a bad result is, in most cases, not caused by the average. Most of the time, outliers drag down the overall result. Consequently, showing a top-level KPI without quickly allowing for root cause analysis leads to ineffective actions as the vast majority of dimension members is not a problem. Problems often cluster around a particular attribute of a dimension that all members have in common.
 
 For example, Suppliers based in Hong Kong perform worse than suppliers from other countries. It’s easy to then drill down into suppliers from Hong Kong.
 
-image 3–1 by the author
+![2021-04-15-14-22-32](/assets/2021-04-15-14-22-32.png)
 
 By spreading out the KPI along critical dimensions and attributes, the manager can quickly narrow down the possible causes.
 
@@ -196,7 +198,7 @@ As the time available to the team for making improvements is limited, it’s ess
 
 In the analysis section, we already discussed the importance of outliers. Outliers are exponentially more beneficial to work on as the same action is usually required to improve both an outlier and an average member, while the potential increase of the overall KPI is much greater with the outlier.
 
-image 4–1 by the author
+![APeXN7LalY](/assets/APeXN7LalY.png)
 
 The graph above shows the top customers that had the worst impact on the KPI over the last period. Most of the time, we can calculate this by the overall KPI of the customer times the transaction/activity frequency. E.g., A frequent customer performing bad will drag down the overall KPI more than a one time customer.
 
@@ -206,25 +208,25 @@ This shows that the impact we can have with our actions is more determined by wh
 
 Assuming we have time to work on the top 3 customers each month, we can now simulate the overall KPI outcome. You can see the second green bar on the leading three suppliers in image 4–1. Improving these customers with 90% confidence would result in below improvement on the overall KPI.
 
-image 4–2 by the author
-
-image 4–3 by the author
+![mPAHL32Mks](/assets/mPAHL32Mks.png)
 
 Confidentiality and customer choice can be adjusted without additional effort, which allows the manager to simulate possible actions, formulate the best measures, and set a realistic target for the next period.
 
 Including the managers’ expert business knowledge in this step is essential as specific customers will have more or less business in the future, or some customers might be harder to handle than others.
 ##CHECK / Were the actions successful?
 
-image 4–4 by the author
+![0_DKj1SIly3oY2wjKi](/assets/0_DKj1SIly3oY2wjKi.jfif)
 
 Setting a goal to achieve for each period helps the manager understand if the defined actions were successful. It’s a step often overlooked but extremely important because it shows the improvement over time and, therefore, the team’s work.
 
 In a real-world scenario, the chart never increases steadily but looks more like the stock market’s ups and downs. As with the stock market, if the trend goes up, the actions are successful. If decreases can be explained (e.g., CoVid19), everything is fine.
 
-image 5–1 by the author
+![0_7b803QBHUot2IC24](/assets/0_7b803QBHUot2IC24.jfif)
+
 The chart shows the target SET for each month compared to the actual figures.
 
-image 6–1 by the author
+![0_cimeJA3D0NxZp82x](/assets/0_cimeJA3D0NxZp82x.png)
+
 You can think of the improvement process as a circle that continually iterates, moving upwards in the best case.
 
 Similarly, the dashboard's value can be judged by the value difference between the introduction and the current period over time.
@@ -235,24 +237,24 @@ However, it’s essential to understand that the actions taken and not the dashb
 As there is no perfect solution, there is one feature missing I would hope SAP would implement in the future:
 All actions coming from the insights must be captured and followed up outside the tool. I would love to see integrated task management or direct integration to a tool like Trello that helps create and follow up on tasks derived from insights.
 
-#Designing an IT system to optimally support Business Process Improvement
+#Designing an IT system to support Business Process Improvement optimally
 
-## Current System Landscape and it's Users
+## Current System Landscape and its Users
 
 ![eea1KKvyuf](/assets/eea1KKvyuf.png)
 
-the image above shows in a very simple way the groups that consume reporting and the frequency reporting is needed by them. Each Layer has different requirements on how they deal with data and the way it is consumed.
+The image above shows in a very simple way the user groups that consume reporting (y) and the frequency reporting is needed by them (x). Each group and frequency has different requirements on relevant information and the way to consume it.
 
 ###Operational Reporting:
-This is the reporting layer used by specialists on a day-to-day basis to verify the daily operations and smoothness of processes in the systems. Questions that a reporting system in this layer needs to answer are e.g.:
+Operational reporting is the reporting layer used by specialists on a day-to-day basis to verify the daily operations and smoothness of processes in the systems. Questions that a reporting system in this layer needs to answer are, e.g.:
 
-1. Have all invoices been posted?
+1. Were all invoices posted?
 2. Have all goods been sent out to the customer?
 3. Are there any processing errors?
 
-The focus for this kind of reporting lies on actuality of the data. This layer is also the only kind of reporting that justifies the struggle of real-time view on processes on the system.
+The focus for this kind of reporting lies in the actuality of the data. This layer is also the only kind of reporting that justifies the struggle to have a real-time view of processes on the system.
 
-Gladly, a reporting on daily basis does not have deep analysis requirements as time is usually too short to spend much of the day on analysis. Therefore a quick reporting is usually setup in the system where the action is performed.
+Gladly, daily reporting does not have deep analysis requirements as time is usually too short to spend much of the day on analysis. Therefore a quick reporting is generally set up in the system where the specialist acts.
 
 Summary Operational Reporting:
 - Fast
@@ -262,11 +264,11 @@ Summary Operational Reporting:
 
 ###Core KPI Layer
 
-The Core KPI Layer (yellow) is classified as containing the top KPI that are necessary to run the company. These KPI are crucial and must be compareable over long periods of time as decisions that are made at this level are strategic and take time to show their impact in the actual data.
+The Core KPI Layer (yellow) contains the top KPIs that are necessary to run the company. These KPIs are crucial and must be comparable over long periods. Decisions made at this level are strategic and take time to show their impact on the actual data.
 
-A system that produces these figures must be stable, reliable and able to deal with huge amounts of data. These requirements cause the system to necessarily have long development cycles and other load restrictions due to the huge amount of data.
+A system that produces these figures must be stable, reliable, and able to deal with vast amounts of data. These requirements cause the system to have long development cycles and data load restrictions due to the massive data.
 
-Traditionally most companies have a sophisticated data warehouse solution in place that deals with the core KPI layer requirements. As described in chapter 1 it's usually the Controllers Job to find and prepare the important data points in a meaningful way and present them to the top management.
+Traditionally most companies have a sophisticated data warehouse solution that deals with the core KPI layer requirements. As described in chapter 1, it's usually the Controllers Job to find and prepare the critical data points in a meaningful way and present them to the top management.
 
 Summary Core KPI Layer:
 
@@ -278,72 +280,86 @@ Summary Core KPI Layer:
 
 ###Agile KPI Layer
 
-The Agile KPI Layer(green) contains all the error analysis, reporting and nitty gritty that the middle manager needs to run the business under his responsibility. The insights that a middle manager wants to derive from data are more on the short term but therefore need to be more flexible than the requirements of top management and data volumes needed are smaller but need to be more detailed.
+The Agile KPI Layer(green) contains all the error analysis, reporting, and nitty-gritty that the middle manager needs to run the business under his responsibility. The insights that a middle manager wants to derive from data are more in the short term but need to be more flexible than top management requirements, and data volumes needed are smaller but need to be more detailed.
 
 Traditionally companies rely on the swiss army knife of software: Excel.
+This flexibility is paid for by much manual work, errors, and shallow analysis.
 
 Summary Agile KPI Layer:
 
 - Flexible
 - Short development Cycles
-- Small / Mid size volumes of data
+- Small / Midsize volumes of data
 - Excel
 
 ## The Gap to Close
 
-What we see is that from the three reporting layers it's the agile KPI layer that is the one with the least software support. This is mostly because this space is the newest. Previously Excel and operational reports were just enough to handle those requirements. However, the increase in data that is collected and the decentralization of tasks in a Shared Service Center make it less and less feasible to handle these tasks in Excel.
+We see that from the three reporting layers, the agile KPI layer is the one with the least software support. The lack of software support is mainly because this space is the newest. Previously Excel and operational reports were just enough to handle those requirements. However, the increase in data collection and the decentralization of tasks in a Shared Service Center make it less and less feasible to handle these tasks in Excel.
 
-Furthermore, computing and storage cost have decreased tremendously over the last years turning the cost benefit analysis in favor of an automated solution in many more cases. These developments lead to a widening gap that is not adapted by many companies today.  
+Furthermore, computing and storage costs have decreased tremendously over the last years, turning the cost-benefit analysis in favor of an automated solution in many more cases. These developments lead to a widening gap that is not adapted by many companies today.  
 
 ## The best practice solution architecture
 
-The first thought of just increasing Operational Reporting capability or building more Data Warehouse reports falls short looking at the very different nature of the agile KPI layer.
+The first thought of just increasing Operational Reporting capability or building more Data Warehouse reports falls short, looking at the very different nature of the agile KPI layer.
 
-The show stopper for integrating the agile requirements into the core KPI layer are the long development cycles and amount of IT effort involved for their development.
+The show stopper for integrating the agile requirements into the core KPI layer is the long development cycles and IT effort involved.
 
-The operational Reporting falls short in the source systems capabilities for advanced analysis. Additionally a source system reporting only allows insight into the data that is managed in that specific source system. Oftentimes insights are gained by combining data from many data sources along the process.
+The operational Reporting falls short in the source systems capabilities for advanced analysis. Additionally, a source system reporting only allows insight into the data that that specific source system holds. Often insights are gained by combining data from many data sources along the process.
+
+We tried only using Self Service BI tools (SAP Analytics Cloud or Power BI) to fulfill the requirements in our first rotation of development. While those tools have very impressive calculation and presentation capabilities, they lack the modeling and automation ability to handle dataset joins that lead to result tables in the size of 1M rows and 100 columns.
+
+In our experience, after around 25M cells, it gets messy. Calculations have long run times or fail. Joins with more than five tables are hard to work with at any size.
+
+This lead to frustration and confusion for our business department and us into adapting the below approach.
 
 ![](2021-04-14-14-51-08.png)
 
-In the image you see the final architecture of the flexible warehouse.
+The image shows the final architecture of the flexible warehouse.
 
-1. Data is initially exctracted from many different source systems. In our case this is our SAR R3 System EP1, an SAP BW system that sits on top of the SAP R3 System, an external Business Workflow system called EFLOW and additional excel files that contain additional business logic or report downloads from other software that is not yet automatically connected
+1. Data is initially extracted from many different source systems. In our case, this is:
 
-2. Data is extracted from the SAP EP1 system and EFLOW system on a weekly schedule into the company data lake
+an SAP R3 System (EP1)
+an SAP BW system that sits on top of the SAP R3 System
+an external Business Workflow system called EFLOW
+additional excel files that contain additional business logic or report downloads from other software that is not yet automatically connected.
 
-3. With the help of microsoft azure data factory the data from data lake, BW and Excel can be accessed.
+2. Data is extracted from the SAP EP1 system and EFLOW system weekly into the company data lake.
 
-4. A data warehouse is setup in the Azure SQL Server that executes ETL functions and adds business logic where necessary.
+3.We can access the data from the data lake, BW, and Excel with the help of the Microsoft Azure Data Factory.
 
-5. The result of this transformation are data model tables that can be accessed by BI tools like SAP Analytics Cloud or Microsoft Power BI.
+4. A data warehouse is set up in the Azure SQL Server that executes ETL functions and adds business logic where necessary.
 
-Let's have a look at the advantages and trade offs that this architecture makes to make it a much better fit for the agile KPI Layer and fulfills the requirements for agility while providing automation that allows for deep root cause analysis
+5. The result of this transformation is data model tables that BI tools like SAP Analytics Cloud or Microsoft Power BI can access.
+
+Let's look at the advantages and trade-offs that this architecture makes to make it a much better fit for the agile KPI Layer and fulfill the requirements for agility while providing automation that allows for deep root cause analysis.
 
 ### Changeability & Extendability by Business
 
 ![Inked2021-04-14-14-51-08_LI](/assets/Inked2021-04-14-14-51-08_LI.jpg)
 
-In order to achieve that we have to first transfer the knowledge of how to design and build dashboards and reports with self service BI tools to business. This gives them all the freedom they had with Excel while automating the data preparation and later the consumption of the report. Everything in the presentation area is business responsibility (right to the green line)
+To achieve that, we have first to transfer the knowledge of how to design and build dashboards and reports with self-service BI tools to business. Handing governance of the display layer over to business gives them all the freedom they had with Excel while automating the data preparation and later the consumption of the report. Everything in the presentation area is business responsibility (right to the green line)
 
-This is only possible through hands on training and persistence as it takes a while to get through the highs and lows of adapting to new technology.
+Training a group of key-users is only possible through hands-on training and persistence as it takes a while to get through the highs and lows of adapting to new technology.
 
-In our experience around 90% of business logic and KPI can be calculated on the fly in the BI tool and are therefore under complete control of the business department, that can change them in self service manner if needed. Contrary to a BW system where the business logic is calculated in the reporting cube and setup by IT.
+In our experience, around 90% of business logic and KPI can be calculated on the fly in the BI tool and are therefore under complete control of the business department, changing them in self-service manner if needed. Contrary to a BW system where the business logic is calculated in the reporting cube and set up by IT.
 
-The second requirement of change is adding additional data or dimensions. This is achieved through the fact that each model table can be merged with additional data that is manually added and then joined. This way, business can quickly add addtional dimensions.
+The second requirement of change is adding additional data or dimensions. Adding further data quickly is possible because we can merge each model table of the flexible data warehouse with other manually added data and then joined. This way, business can quickly add additional dimensions.
 
 ![](2021-04-09-11-14-55.png)
 
-These two types of change we call Type 1 changes. They are characterized by high flexibility, easiness and **don't involve any IT staff** Business can try out new ideas and additional requirements his way. There is a trad-off in that these type1 changes increase complexity for business to handle and also decrease automation as the additional files must be handled manually.
+These two types of change we call Type 1 changes. They have high flexibility, are easy to implement, and **don't involve any IT staff**. Business can try out new ideas and additional requirements his way.
 
-Because of that there is another change we call Type 2 change. A Type 2 change is always preceded by a Type1 change that serves as blueprint for the type 2 change. What this means is that it basically moves the data source further back in the pipeline to automate the extraction and processing.
+There is a trade-off in that these type1 changes increase complexity for business to handle and decrease automation as the key users must maintain the additional files manually.
+
+Because of that, there is another change we call type2 change. A type2 change is always preceded by a Type1 change that serves as the blueprint for the type 2 change. A type2 change moves the data source further back in the pipeline to automate the extraction and processing.
 
 ![InkedInked2021-04-14-14-51-08_LI](/assets/InkedInked2021-04-14-14-51-08_LI.jpg)
 
-This will increase the automation and decrease the complexity as the processing is now handled automatically in the pipeline. However, this involves IT effort and additional testing of all affected data streams.
+This move will increase automation and decrease complexity for business as the processing is now handled automatically in the pipeline. However, it involves IT effort and additional testing of all affected data streams.
 
-handling changes in this manner also decreases friction between Business and IT department where business fails to describe exactly what they want (IT perspective :) ) or IT fails to understand the business idea (Business perspective :) ) as the type1 change serves as blueprint.
+Handling changes in this two-step approach also decreases friction between Business and IT department where business fails to exactly describe what they want (IT perspective :) ) or IT fails to understand the business idea (Business perspective :) ) as the type1 change serves as a blueprint.
 
-Optimally many Type1 changes are combined into one bigger Type2 change as testing and implementation effort can be reduced significantly this way.
+Optimally, we combine many Type1 changes into one bigger Type2 change as testing, and we can significantly reduce implementation effort this way.
 
 As below shown as business value created by changes over time
 
@@ -353,39 +369,39 @@ As below shown as business value created by changes over time
 
 Short development cycles are achieved by decreasing complexity. One big part of that is the change strategy introduced in the previous chapter. It enables leaving business logic to business.
 
-There are several other design principles that ensure short development cycles.
+Several other technical design principles ensure short development cycles.
 
-**The more frequently a logic / procedure changes, the closer to the end it should be put in the pipeline**
+**The more frequently a logic/procedure changes, the closer to the end we should put it in the pipeline**
 
-In our case this means the following:
+In our case, this means the following:
 
 ![Inked2021-04-14-14-51-08_LI](/assets/Inked2021-04-14-14-51-08_LI_mgw783w7n.jpg)
 
-Until the green line there is no logic whatsoever. The tables from the source systems are loaded completely and without any delta update logic. Contrary to a BW solution this is possible because storage and compute power are cheap and the data volume is not that high.
+Until the green line, there is no logic whatsoever. The tables from the source systems are loaded entirely and without any delta update logic. Contrary to a BW solution, the data volume is not huge, and storage and compute power are cheap nowadays.
 
-Until the orange line the data is filtered by very high level case specifics. E.G. Data from Chinese Entities.
+Until the orange line, we filter the data by very high-level case specifics, e.g., Data from Chinese Entities.
 
-Until the blue line general ETL functions are executed on the data. There is still no specific logic
+Until the blue line, only general ETL functions prepare the data. There is still no specific logic.
 
-Until the red line tables are prepared only into their natural objects. e.g. SAP Invoice, Credit Line Workflow etc.
+Until the red line, tables are prepared and joined only into their natural objects. e.g., SAP Invoice, Credit Line Workflow, etc.
 
-Only after the red line business logic and frequently changing transformations are added.
+Only after the red line business logic and frequently changing transformations take place.
 
-This layered approach keeps the core stable and easy and allows for more frequent change. The changes can be made most of the time without touching anything behind the red line. The only exception being big Type2 changes.
+This layered approach keeps the core stable, easy while allowing for more frequent change. We can make the changes most of the time without touching anything behind the red line. The only exception being big Type2 changes.
 
 **Avoid storage tables completely**
 
-In the flexible data warehouse ALL tables should be completely recreated with each pipeline run. This allows us to add additional columns and calculations without having to worry about any legacy data.
+In the flexible data warehouse, We should completely recreate ALL tables with each pipeline run. Following this rule allows us to add additional columns and calculations without worrying about any legacy data.
 
-I'll say it again because this is huge! In the flexible data warehouse we don't have to worry about any legacy data!
+I'll repeat it because this is huge! In the flexible data warehouse, we don't have to worry about any legacy data!
 
-This means that we don't have to write complex update routines for our tables or manually add legacy columns after we downloaded them. There are no slowly changing dimensions needed to be taken care of.
+Getting rid of storing legacy data means that we don't have to write complex update routines for our tables or manually add legacy columns after downloading them. There are no slowly changing dimensions needed to be taken care of.
 
-This eliminates the biggest source of errors and manual work in the development cycle and is the biggest difference compared to the classic BW system where complex delta updates are setup. This is partly because in the past it was necessary and partly because the data is used is huge.
+This eliminates the biggest source of errors and manual work in the development cycle and is the most significant difference compared to the classic BW system that has to do complex delta updates. Partly because in the past, it was necessary and partially because the data used is enormous.
 
-The tradeoff in that case is less manual work and higher stability for accuracy. If legacy data is changed in the source system it is also changed in our flexible data warehouse. If a supplier name is changed it is also changed for all legacy data under that supplier number.
+The trade-off, in that case, is less manual work and higher stability for accuracy. If legacy data is changed in the source system, it is also changed in our flexible data warehouse. E.g., If a supplier name is changed, it is also adjusted for all legacy data under that supplier number.
 
-In the flexible warehouse we are very willing to take this tradeoff. For the core KPI layer it might be a different discussion.
+In the flexible warehouse, we are very willing to make this trade-off. For the core KPI layer, it might be a different discussion.
 
 #Implementation of the flexible data Warehouse
 
@@ -2788,13 +2804,23 @@ Credit Management
 
 # Monitoring
 
+With Aure Data Factory it's very easy to keep an overview of all the data pipeline runs in the solution space. You can quickly see which pipelines ran over a period of time and how it was triggered.
+
 ![](2021-04-16-11-37-12.png)
 
 ![](2021-04-16-11-37-41.png)
 
+Every pipeline is setup in modular fashion. The monitoring function gives you an easy overview of which modules were running successfully or which one caused the pipeline to stop.
+
 ![](2021-04-16-11-37-59.png)
 
+For data flows it's even possible to see how each action performed and how many rows very processed etc.
+
 ![](2021-04-16-11-38-32.png)
+
+In case of errors it's very easy to find the root cause as the errors are pretty detailed
+
+>For stored procedures the error message of the lowest subroutine is returned making it easy to get to the root cause of the bug.
 
 ![](2021-04-16-11-38-58.png)
 
@@ -2994,6 +3020,11 @@ Some tables are generated automatically here we don't need to add additional col
 
 ### Add new BW cube to Solution Space
 
+As described previously it's advisable to ask business to first do a check by downloading the BW report to Excel and build a dashboard to understand their requirements by themselves. (type1 change)
+
+Once the requirements are clarified we can continue with initiation the type2 change.
+
+In that case a Denodo base view has to be created by HQ. This can be done by contacting Mandeep Kaur.
 
 # Issues
 ## We (Business) want to add a new calculated dimension but in SAC we get the following error
@@ -3032,12 +3063,24 @@ update o2c.tp3_all_cust_items set vat_issued = 'VAT issued' where left(REFERENCE
 
 2.2 Add the new column to the STA_* tables needed
 
-2.3 Follow steps 1.1 - 1.5 froma above
+2.3 Follow steps 1.1 - 1.5 from above
 
 ++ can fulfill all business requirements
 -- IT effort
 
-> Again it makes sense to do option 1 first and then move all the additonal calculations to the SQL server once there are a couple of them accumulated in the SAC model
+> Again it makes sense to do option 1 first and then move all the additonal calculations to the SQL server once there are a couple of them accumulated in the SAC model (type1 change first)
 
 
 ## Business thinks that the data is wrong
+
+At the start of the implementation phase this seemed to almost always be correct. With great help of our key users we were able to find many bugs during testing phase.
+
+During the end of the project however, in almost all cases the error was not in the solution but in the Excel comparison.
+
+In case business reports that the data is wrong we can have a quick check as follows:
+
+1. Ask for a sample set that should be included but is not / or is excluded but should be not
+
+2. Check back into through STA / TP3 / TP2 / TP1 / CLN / ING tables to find the root cause.
+
+3. If a calculation like 'arrears after net' is wrong check directly in EP1 system.
