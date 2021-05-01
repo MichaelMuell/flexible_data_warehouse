@@ -4,17 +4,20 @@
 
 by Michael Muell
 
+<div style="page-break-after: always;"></div>
 
+# Table of Content
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 <!-- code_chunk_output -->
 
 - [The Flexible Data Warehouse - Solution Handbook](#the-flexible-data-warehouse-solution-handbook)
+- [Table of Content](#table-of-content)
 - [Introduction & Remarks](#introduction-remarks)
   - [Important](#important)
   - [Chapter1:](#chapter1)
   - [Chapter2:](#chapter2)
   - [Chapter3:](#chapter3)
-- [The Framework for Business Process Improvement](#the-framework-for-business-process-improvement)
+- [Chapter1: The Framework for Business Process Improvement](#chapter1-the-framework-for-business-process-improvement)
   - [The dashboard that shows just numbers misses the point.](#the-dashboard-that-shows-just-numbers-misses-the-point)
   - [The main job of the middle manager is process optimization.](#the-main-job-of-the-middle-manager-is-process-optimization)
   - [IDENTIFY / Is There a Problem?](#identify-is-there-a-problem)
@@ -22,7 +25,7 @@ by Michael Muell
   - [ACT / Which Actions Should We Take?](#act-which-actions-should-we-take)
   - [CHECK / Were the actions successful?](#check-were-the-actions-successful)
   - [How to improve even more!](#how-to-improve-even-more)
-- [Designing an IT system to support Business Process Improvement optimally](#designing-an-it-system-to-support-business-process-improvement-optimally)
+- [Chapter2: Designing an IT system to support Business Process Improvement optimally](#chapter2-designing-an-it-system-to-support-business-process-improvement-optimally)
   - [Current System Landscape and its Users](#current-system-landscape-and-its-users)
     - [Operational Reporting:](#operational-reporting)
     - [Core KPI Layer](#core-kpi-layer)
@@ -31,7 +34,7 @@ by Michael Muell
   - [The best practice solution architecture](#the-best-practice-solution-architecture)
     - [Changeability & Extendability by Business](#changeability-extendability-by-business)
     - [Short Development Cycles](#short-development-cycles)
-- [Implementation of the flexible data Warehouse](#implementation-of-the-flexible-data-warehouse)
+- [Chapter3: Implementation of the flexible data Warehouse](#chapter3-implementation-of-the-flexible-data-warehouse)
   - [Systems](#systems)
     - [Data Factory](#data-factory)
     - [SQL Server](#sql-server)
@@ -67,6 +70,8 @@ by Michael Muell
     - [Config ETL Functions](#config-etl-functions)
     - [CLN_FI1000](#cln_fi1000)
   - [Transform 1 and Transform 2](#transform-1-and-transform-2)
+    - [O2C](#o2c)
+    - [P2P](#p2p)
     - [TP1_EKBE](#tp1_ekbe)
   - [Transform 3](#transform-3)
     - [P_TP30_ALL_ITEMS](#p_tp30_all_items)
@@ -113,7 +118,7 @@ by Michael Muell
   - [Business thinks that the data is wrong](#business-thinks-that-the-data-is-wrong)
 
 <!-- /code_chunk_output -->
-
+<div style="page-break-after: always;"></div>
 
 # Introduction & Remarks
 
@@ -146,7 +151,9 @@ Through the last year, we implemented the flexible data warehouse described in c
 
 The coding samples do not include all coding but only the building blocks to explain how you can implement these principles. The code does not claim to be perfect but functional.
 
-#The Framework for Business Process Improvement
+<div style="page-break-after: always;"></div>
+
+#Chapter1: The Framework for Business Process Improvement
 
 ## The dashboard that shows just numbers misses the point.
 
@@ -171,7 +178,7 @@ Process optimization is a multi-step process. Depending on your source, the numb
 3. Define actions and execute them
 4. Check if the actions were successful
 
-![P27mSb7fpB](/assets/P27mSb7fpB.png)
+<img src="/assets/P27mSb7fpB.png" width="500">
 
 The managers’ success is measured mainly by this task. That is correct in most cases as he is usually receiving a bonus based on how well the KPIs under his responsibility perform over a given period. Our goal is to design an information system to support him with this task. The best way to do that is to help him answer the main questions related to each step based on the data we have:
 
@@ -204,7 +211,7 @@ As the time available to the team for making improvements is limited, it’s ess
 
 In the analysis section, we already discussed the importance of outliers. Outliers are exponentially more beneficial to work on as the same action is usually required to improve both an outlier and an average member, while the potential increase of the overall KPI is much greater with the outlier.
 
-![APeXN7LalY](/assets/APeXN7LalY.png)
+<img src="/assets/APeXN7LalY.png" width="400">
 
 The graph above shows the top customers that had the worst impact on the KPI over the last period. Most of the time, we can calculate this by the overall KPI of the customer times the transaction/activity frequency. E.g., A frequent customer performing bad will drag down the overall KPI more than a one time customer.
 
@@ -242,8 +249,9 @@ However, it’s essential to understand that the actions taken and not the dashb
 ##How to improve even more!
 As there is no perfect solution, there is one feature missing I would hope SAP would implement in the future:
 All actions coming from the insights must be captured and followed up outside the tool. I would love to see integrated task management or direct integration to a tool like Trello that helps create and follow up on tasks derived from insights.
+<div style="page-break-after: always;"></div>
 
-#Designing an IT system to support Business Process Improvement optimally
+#Chapter2: Designing an IT system to support Business Process Improvement optimally
 
 ## Current System Landscape and its Users
 
@@ -350,7 +358,8 @@ In our experience, around 90% of business logic and KPI can be calculated on the
 
 The second requirement of change is adding additional data or dimensions. Adding further data quickly is possible because we can merge each model table of the flexible data warehouse with other manually added data and then join. This way, business can quickly add additional dimensions.
 
-![](2021-04-09-11-14-55.png)
+<img src="2021-04-09-11-14-55.png" width="300">
+
 
 These two requirements of change we call Type 1 changes. They have high flexibility, are easy to implement, and **don't involve any IT staff**. Business can try out new ideas and additional requirements his way.
 
@@ -407,8 +416,9 @@ This eliminates the biggest source of errors and manual work in the development 
 The trade-off, in that case, is less manual work and higher stability for accuracy. If legacy data is changed in the source system, it is also changed in our flexible data warehouse. E.g., If a supplier name is changed, it is also adjusted for all legacy data under that supplier number.
 
 In the flexible warehouse, we are very willing to make this trade-off. For the core KPI layer, it might be a different discussion.
+<div style="page-break-after: always;"></div>
 
-#Implementation of the flexible data Warehouse
+#Chapter3: Implementation of the flexible data Warehouse
 
 ##Systems
 
@@ -1169,13 +1179,27 @@ In these stages, all Joins are done. The Joins can only access tables that are i
 
 Transform 1 joins tables to Dimensions that can then be reused to join multiple other FACT tables to the base models. e.g., combines the customer master tables KNA1 and KNB1 to the dimension customer.
 
-|  Model | sta_all_items |sta_open_items_monthly|sta_irb_full|sta_irb_monthly|sta_all_cust_items|sta_open_cust_items| sta_eflow_clr|sta_eflow_likp|sta_fi1000|sta_payment_behavior|
+###O2C
+<font size="1">
+
+|  Model | sta_all_cust_items|sta_open_cust_items| sta_eflow_clr|sta_eflow_likp|sta_fi1000|sta_payment_behavior|
+|---|---|---|---|---|---|---|
+| TP3 | tp3_all_cust_items|tp3_all_cust_items| -| -|tp3_fi1000|combination of (sta_all_cust_items, sta_open_cust_items, tp1_customer)|
+|TP2 | tp2_all_cust_items<br>*(tp1_all_cust_items <br>tp1_customer <br>tp1_dispute<br>cln_sample_orders <br>cln_overdue_reason)* |tp2_all_cust_items<br>*(tp1_all_cust_items <br>tp1_customer <br>tp1_dispute<br>cln_sample_orders <br>cln_overdue_reason)* |-|-|tp2_fi1000<br>*(tp1_fi1000 <br> tp1_customer)*|-|
+|TP1|tp1_all_cust_items<br>*(cln_bsid<br>cln_bsad<br>cln_bkpf)* <br><br>tp1_customer<br>*(cln_knb1<br>cln_kna1<br>cln_t001s<br>cln_adrc<br>cln_knkk<br>cln_t001)*<br><br>tp1_dispute<br>*(cln_fdm_dcproc<br>cln_udmcaseattr00<br>cln_scmg_t_case_attr)*|tp1_all_cust_items<br>*(cln_bsid<br>cln_bsad<br>cln_bkpf)* <br><br>tp1_customer<br>*(cln_knb1<br>cln_kna1<br>cln_t001s<br>cln_adrc<br>cln_knkk<br>cln_t001)*<br><br>tp1_dispute<br>*(cln_fdm_dcproc<br>cln_udmcaseattr00<br>cln_scmg_t_case_attr)*|cln_eflow_likp<br>*(cln_eflowtask<br>cln_eflow_likp)* <br> <br> cln_vbuk <br><br>cln_kna1|cln_eflow_task|tp1_customer<br>*(cln_knb1<br>cln_kna1<br>cln_t001s<br>cln_adrc<br>cln_knkk<br>cln_t001)*<br><br>cln_fi1000|-|
+SOURCE|EP1:bsid,bsad,bkpf,knb1,kna1,t001s,adrc,knkk, t001, cln_fdm_dcproc,cln_udmcaseattr00, cln_scmg_t_case_attr,t052 <br>EXCEL: cln_sample_orders, cln_overdue_reason|EP1:bsid,bsad,bkpf,knb1,kna1,t001s,adrc,knkk, t001, cln_fdm_dcproc,cln_udmcaseattr00, cln_scmg_t_case_attr, t052 <br>EXCEL: cln_sample_orders, cln_overdue_reason|EFLOW:v-dp-proc-048-dnno,v-dp-tasks <br> EP1: likp,vbuk |EFLOW: v-dp-tasks |BW: fi1000 <br> EP1: knb1, kna1,t001s, knkk, t001, adrc|EP1:bsid,bsad,bkpf,knb1,kna1,t001s,adrc,knkk, t001
+</font>
+
+###P2P
+<font size="1">
+
+|  Model | sta_all_items |sta_open_items_monthly|sta_irb_full|sta_irb_monthly|
 |---|---|---|---|---|---|---|---|---|---|---|
 | TP3 | tp3_all_items <br> *(tp2_open_items union tp2_cleared_items)* | tp3_all_items <br> *(tp2_open_items union tp2_cleared_items)*  |tp3_irb |tp3_irb |tp3_all_cust_items|tp3_all_cust_items| -| -|tp3_fi1000|combination of (sta_all_cust_items, sta_open_cust_items, tp1_customer)|
 |TP2 | tp2_open_items/tp2_cleared_items<br>(*cln_bsak/cln_bsik <br> tp1_vendor_dim <br>cln_t001 <br>cln_regup <br>cln_bkpf <br>cln_overdue_reason <br> cln_payment_calendar*) | tp2_open_items/tp2_cleared_items<br>(*cln_bsak/cln_bsik <br> tp1_vendor_dim <br>cln_t001 <br>cln_regup <br>cln_bkpf <br>cln_overdue_reason <br> cln_payment_calendar*) |tp2_irb<br>(*tp1_irb<br>cln_tradeshift_invoices <br>tp1_ekbe_ref<br> tp1_ekbe_po <br> tp1_vendor_dim*)|tp2_irb<br>(*tp1_irb<br>cln_tradeshift_invoices <br>tp1_ekbe_ref<br> tp1_ekbe_po <br> tp1_vendor_dim*)|tp2_all_cust_items<br>*(tp1_all_cust_items <br>tp1_customer <br>tp1_dispute<br>cln_sample_orders <br>cln_overdue_reason)* |tp2_all_cust_items<br>*(tp1_all_cust_items <br>tp1_customer <br>tp1_dispute<br>cln_sample_orders <br>cln_overdue_reason)* |-|-|tp2_fi1000<br>*(tp1_fi1000 <br> tp1_customer)*|-|
 |TP1|tp1_vendor_dim <br>*(cln_vf_kred<br>cln_t001s<br>cln_adrc)*|tp1_vendor_dim <br>*(cln_vf_kred<br>cln_t001s<br>cln_adrc)*| tp1_irb<br>*(cln_fi5000 <br>cln_ocrlog<br>cln_ekko<br>cln_eban<br>cln_t024<br>cln_t001)* <br><br>tp1_ekbe<br>*(cln_ekbe)* <br><br>tp1_vendor_dim <br>*(cln_vf_kred<br>cln_t001s<br>cln_adrc)*|tp1_irb<br>*(cln_fi5000 <br>cln_ocrlog<br>cln_ekko<br>cln_eban<br>cln_t024<br>cln_t001)* <br><br>tp1_ekbe<br>*(cln_ekbe)* <br><br>tp1_vendor_dim <br>*(cln_vf_kred<br>cln_t001s<br>cln_adrc)*|tp1_all_cust_items<br>*(cln_bsid<br>cln_bsad<br>cln_bkpf)* <br><br>tp1_customer<br>*(cln_knb1<br>cln_kna1<br>cln_t001s<br>cln_adrc<br>cln_knkk<br>cln_t001)*<br><br>tp1_dispute<br>*(cln_fdm_dcproc<br>cln_udmcaseattr00<br>cln_scmg_t_case_attr)*|tp1_all_cust_items<br>*(cln_bsid<br>cln_bsad<br>cln_bkpf)* <br><br>tp1_customer<br>*(cln_knb1<br>cln_kna1<br>cln_t001s<br>cln_adrc<br>cln_knkk<br>cln_t001)*<br><br>tp1_dispute<br>*(cln_fdm_dcproc<br>cln_udmcaseattr00<br>cln_scmg_t_case_attr)*|cln_eflow_likp<br>*(cln_eflowtask<br>cln_eflow_likp)* <br> <br> cln_vbuk <br><br>cln_kna1|cln_eflow_task|tp1_customer<br>*(cln_knb1<br>cln_kna1<br>cln_t001s<br>cln_adrc<br>cln_knkk<br>cln_t001)*<br><br>cln_fi1000|-|
 SOURCE|EP1: bsik, bsak, t001,vf_kred,adrc, regup,bkpf <br>EXCEL:overdue_reason, payment_calendar|EP1: bsik, bsak, t001,vf_kred,adrc, regup,bkpf <br>EXCEL:overdue_reason, payment_calendar| BW:FI5000 <br> EP1:zsi_ir_ic_ocrlog,ekko,ekbe, eban,vf_kred,t001,t001s,adrc,t024<br> EXCEL: tradeshift_invoices| BW:FI5000 <br> EP1:zsi_ir_ic_ocrlog,ekko,ekbe, eban,vf_kred,t001,t001s,adrc,t024<br> EXCEL: tradeshift_invoices|EP1:bsid,bsad,bkpf,knb1,kna1,t001s,adrc,knkk, t001, cln_fdm_dcproc,cln_udmcaseattr00, cln_scmg_t_case_attr,t052 <br>EXCEL: cln_sample_orders, cln_overdue_reason|EP1:bsid,bsad,bkpf,knb1,kna1,t001s,adrc,knkk, t001, cln_fdm_dcproc,cln_udmcaseattr00, cln_scmg_t_case_attr, t052 <br>EXCEL: cln_sample_orders, cln_overdue_reason|EFLOW:v-dp-proc-048-dnno,v-dp-tasks <br> EP1: likp,vbuk |EFLOW: v-dp-tasks |BW: fi1000 <br> EP1: knb1, kna1,t001s, knkk, t001, adrc|EP1:bsid,bsad,bkpf,knb1,kna1,t001s,adrc,knkk, t001
-
+</font>
 
 >Two Transformation stages will be necessary to allow scaling for more and more use cases.
 
