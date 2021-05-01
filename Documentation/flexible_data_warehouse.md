@@ -1,6 +1,13 @@
-# The Flexible Data Warehouse - Solution Handbook
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
 
 ![70lWiBs2AW](/assets/70lWiBs2AW.png)
+
+# The Flexible Data Warehouse - Solution Handbook
 
 by Michael Muell
 
@@ -1179,6 +1186,8 @@ In these stages, all Joins are done. The Joins can only access tables that are i
 
 Transform 1 joins tables to Dimensions that can then be reused to join multiple other FACT tables to the base models. e.g., combines the customer master tables KNA1 and KNB1 to the dimension customer.
 
+<div style="page-break-after: always;"></div>
+
 ###O2C
 <font size="1">
 
@@ -1189,8 +1198,10 @@ Transform 1 joins tables to Dimensions that can then be reused to join multiple 
 |TP1|tp1_all_cust_items<br>*(cln_bsid<br>cln_bsad<br>cln_bkpf)* <br><br>tp1_customer<br>*(cln_knb1<br>cln_kna1<br>cln_t001s<br>cln_adrc<br>cln_knkk<br>cln_t001)*<br><br>tp1_dispute<br>*(cln_fdm_dcproc<br>cln_udmcaseattr00<br>cln_scmg_t_case_attr)*|tp1_all_cust_items<br>*(cln_bsid<br>cln_bsad<br>cln_bkpf)* <br><br>tp1_customer<br>*(cln_knb1<br>cln_kna1<br>cln_t001s<br>cln_adrc<br>cln_knkk<br>cln_t001)*<br><br>tp1_dispute<br>*(cln_fdm_dcproc<br>cln_udmcaseattr00<br>cln_scmg_t_case_attr)*|cln_eflow_likp<br>*(cln_eflowtask<br>cln_eflow_likp)* <br> <br> cln_vbuk <br><br>cln_kna1|cln_eflow_task|tp1_customer<br>*(cln_knb1<br>cln_kna1<br>cln_t001s<br>cln_adrc<br>cln_knkk<br>cln_t001)*<br><br>cln_fi1000|-|
 SOURCE|EP1:bsid,bsad,bkpf,knb1,kna1,t001s,adrc,knkk, t001, cln_fdm_dcproc,cln_udmcaseattr00, cln_scmg_t_case_attr,t052 <br>EXCEL: cln_sample_orders, cln_overdue_reason|EP1:bsid,bsad,bkpf,knb1,kna1,t001s,adrc,knkk, t001, cln_fdm_dcproc,cln_udmcaseattr00, cln_scmg_t_case_attr, t052 <br>EXCEL: cln_sample_orders, cln_overdue_reason|EFLOW:v-dp-proc-048-dnno,v-dp-tasks <br> EP1: likp,vbuk |EFLOW: v-dp-tasks |BW: fi1000 <br> EP1: knb1, kna1,t001s, knkk, t001, adrc|EP1:bsid,bsad,bkpf,knb1,kna1,t001s,adrc,knkk, t001
 </font>
+<div style="page-break-after: always;"></div>
 
 ###P2P
+
 <font size="1">
 
 |  Model | sta_all_items |sta_open_items_monthly|sta_irb_full|sta_irb_monthly|
