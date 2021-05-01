@@ -1,8 +1,14 @@
+# The Flexible Data Warehouse - Solution Handbook
+
+![70lWiBs2AW](/assets/70lWiBs2AW.png)
+
+by Michael Muell
+
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
-
 <!-- code_chunk_output -->
 
+- [The Flexible Data Warehouse - Solution Handbook](#the-flexible-data-warehouse-solution-handbook)
 - [Introduction & Remarks](#introduction-remarks)
   - [Important](#important)
   - [Chapter1:](#chapter1)
@@ -16,8 +22,8 @@
   - [ACT / Which Actions Should We Take?](#act-which-actions-should-we-take)
   - [CHECK / Were the actions successful?](#check-were-the-actions-successful)
   - [How to improve even more!](#how-to-improve-even-more)
-- [Designing an IT system to optimally support Business Process Improvement](#designing-an-it-system-to-optimally-support-business-process-improvement)
-  - [Current System Landscape and it's Users](#current-system-landscape-and-its-users)
+- [Designing an IT system to support Business Process Improvement optimally](#designing-an-it-system-to-support-business-process-improvement-optimally)
+  - [Current System Landscape and its Users](#current-system-landscape-and-its-users)
     - [Operational Reporting:](#operational-reporting)
     - [Core KPI Layer](#core-kpi-layer)
     - [Agile KPI Layer](#agile-kpi-layer)
@@ -29,7 +35,7 @@
   - [Systems](#systems)
     - [Data Factory](#data-factory)
     - [SQL Server](#sql-server)
-    - [SAC Filserver:](#sac-filserver)
+    - [SAC Fileserver:](#sac-fileserver)
     - [SAC:](#sac)
 - [Overall Data Flow](#overall-data-flow)
   - [Data Source](#data-source)
@@ -68,7 +74,7 @@
       - [Recalculate Due Date and Arrears after Net](#recalculate-due-date-and-arrears-after-net)
     - [P_TP3_IRB](#p_tp3_irb)
     - [P_TP30_ALL_CUST_ITEMS](#p_tp30_all_cust_items)
-      - [Recalculate Due Days based on VAT issue date](#recalculate-due-days-based-on-vat-issue-date)
+      - [Recalculate Due Days based on the VAT issue date](#recalculate-due-days-based-on-the-vat-issue-date)
       - [Include only specific documents for payment behavior calculation](#include-only-specific-documents-for-payment-behavior-calculation)
   - [Stage](#stage)
       - [STA_ALL_ITEMS](#sta_all_items)
@@ -92,8 +98,8 @@
 - [Monitoring](#monitoring)
   - [Data Flow](#data-flow)
   - [Flow Date Tracking](#flow-date-tracking)
-    - [Export data from EP1](#export-data-from-ep1)
-    - [Import data from EP1 and EFLOW to data lake](#import-data-from-ep1-and-eflow-to-data-lake)
+    - [Export date from EP1](#export-date-from-ep1)
+    - [Import data from EP1 and EFLOW to the data lake](#import-data-from-ep1-and-eflow-to-the-data-lake)
     - [Running Pipeline in Data Factory](#running-pipeline-in-data-factory)
     - [Importing data to SAC](#importing-data-to-sac)
   - [Compare Q-D System](#compare-q-d-system)
@@ -103,7 +109,7 @@
     - [We (Business) want to add a new column to model X](#we-business-want-to-add-a-new-column-to-model-x)
     - [Add new BW cube to Solution Space](#add-new-bw-cube-to-solution-space)
 - [Issues](#issues)
-  - [We (Business) want to add a new calculated dimension but in SAC we get the following error](#we-business-want-to-add-a-new-calculated-dimension-but-in-sac-we-get-the-following-error)
+  - [We (Business) want to add a new calculated dimension, but in SAC, we get the following error](#we-business-want-to-add-a-new-calculated-dimension-but-in-sac-we-get-the-following-error)
   - [Business thinks that the data is wrong](#business-thinks-that-the-data-is-wrong)
 
 <!-- /code_chunk_output -->
@@ -258,7 +264,6 @@ Gladly, daily reporting does not have deep analysis requirements as time is usua
 
 Summary Operational Reporting:
 - Fast
-- Stable
 - Easy
 - Source System capability
 
@@ -318,14 +323,14 @@ The image shows the final architecture of the flexible warehouse.
 
 1. Data is initially extracted from many different source systems. In our case, this is:
 
-an SAP R3 System (EP1)
-an SAP BW system that sits on top of the SAP R3 System
-an external Business Workflow system called EFLOW
-additional excel files that contain additional business logic or report downloads from other software that is not yet automatically connected.
+- an SAP R3 System (EP1)
+- an SAP BW system that sits on top of the SAP R3 System
+- an external Business Workflow system called EFLOW
+- additional Excel files that contain additional business logic or report downloads from other software that is not yet automatically connected.
 
 2. Data is extracted from the SAP EP1 system and EFLOW system weekly into the company data lake.
 
-3.We can access the data from the data lake, BW, and Excel with the help of the Microsoft Azure Data Factory.
+3. We can access the data from the data lake, BW, and Excel with the help of the Microsoft Azure Data Factory.
 
 4. A data warehouse is set up in the Azure SQL Server that executes ETL functions and adds business logic where necessary.
 
@@ -343,11 +348,11 @@ Training a group of key-users is only possible through hands-on training and per
 
 In our experience, around 90% of business logic and KPI can be calculated on the fly in the BI tool and are therefore under complete control of the business department, changing them in self-service manner if needed. Contrary to a BW system where the business logic is calculated in the reporting cube and set up by IT.
 
-The second requirement of change is adding additional data or dimensions. Adding further data quickly is possible because we can merge each model table of the flexible data warehouse with other manually added data and then joined. This way, business can quickly add additional dimensions.
+The second requirement of change is adding additional data or dimensions. Adding further data quickly is possible because we can merge each model table of the flexible data warehouse with other manually added data and then join. This way, business can quickly add additional dimensions.
 
 ![](2021-04-09-11-14-55.png)
 
-These two types of change we call Type 1 changes. They have high flexibility, are easy to implement, and **don't involve any IT staff**. Business can try out new ideas and additional requirements his way.
+These two requirements of change we call Type 1 changes. They have high flexibility, are easy to implement, and **don't involve any IT staff**. Business can try out new ideas and additional requirements his way.
 
 There is a trade-off in that these type1 changes increase complexity for business to handle and decrease automation as the key users must maintain the additional files manually.
 
@@ -359,9 +364,9 @@ This move will increase automation and decrease complexity for business as the p
 
 Handling changes in this two-step approach also decreases friction between Business and IT department where business fails to exactly describe what they want (IT perspective :) ) or IT fails to understand the business idea (Business perspective :) ) as the type1 change serves as a blueprint.
 
-Optimally, we combine many Type1 changes into one bigger Type2 change as testing, and we can significantly reduce implementation effort this way.
+Optimally, we combine many Type1 changes into one bigger Type2 change because we can significantly reduce implementation and testing effort this way.
 
-As below shown as business value created by changes over time
+As below shown: Business value created by changes over time.
 
 ![2021-04-09-11-15-21](/assets/2021-04-09-11-15-21.png)
 
@@ -387,7 +392,7 @@ Until the red line, tables are prepared and joined only into their natural objec
 
 Only after the red line business logic and frequently changing transformations take place.
 
-This layered approach keeps the core stable, easy while allowing for more frequent change. We can make the changes most of the time without touching anything behind the red line. The only exception being big Type2 changes.
+This layered approach keeps the core stable and easy while allowing for more frequent change. We can make the changes most of the time without touching anything behind the red line. The only exception being big Type2 changes.
 
 **Avoid storage tables completely**
 
@@ -425,7 +430,7 @@ P-System:
 
 sdp-s-p-sqls.database.windows.net
 
-###SAC Filserver:
+###SAC Fileserver:
 
 Input External Excel files
 
@@ -533,11 +538,11 @@ v-dp-tasks
 |P2P_INGEST_DATA_ACCOUNTS_PAYABLES|Ingest of Accounts Payables data to SQL Server
 |P2P_INGEST_DATA_PAYMENTS |Ingest of Payments data to SQL Server
 |P2P_INGEST_DATA_GENERAL| Ingest of all general data/master Data to SQL Server
-|O2C_INGEST_ACCOUNTS_RECEIVEABLES|Ingest of Accounts Receiveables  data to SQL Server|
+|O2C_INGEST_ACCOUNTS_RECEIVEABLES|Ingest of Accounts Receivables data to SQL Server|
 O2C_INGEST_DATA_EFLOW| Ingest of EFLOW and BW data to SQL server
 |O2C_INGEST_DATA_GENERAL|Ingest of general data to SQL Server
 
->>Note: In general all of these flows could be combined into one for each o2c and p2p. However it's easier for debugging and in the future the parts might have to run separately due to different business requirements by each department.
+>>Note: In general, we could combine all of these flows into one for each o2c and p2p. However, it's easier for debugging, and in the future, the parts might have to run separately due to different business requirements by each department.
 
 ###General Data Flow logic
 
@@ -546,40 +551,39 @@ O2C_INGEST_DATA_EFLOW| Ingest of EFLOW and BW data to SQL server
 
 ![](2021-04-09-11-33-30.png)
 
->a. set correct wildcard filepath to find corresponding table on datalake
->b. store filepath in column to enable check in SQL server later  
+>a. set correct wildcard file path to find the corresponding table on data lake
+>b. store file path in a column to enable checking in SQL server later  
 
-**2. Select relevant columns from table and rename them into names that make sense**
+**2. Select relevant columns from the table and rename them into names that make sense**
 ![](2021-04-09-11-35-05.png)
->Do this step as early as possible to work with 'real names'. Use these consistently
+>Do this step as early as possible to work with 'real names.' Use these consistently
 
 **3. Filter relevant Data**
 
 ![](2021-04-09-11-37-23.png)
 
->Use filters do exclude not needed data. Exclude as much as possible in data flows as they run on Spark Cluster! Performance is much better than in the SQL Server
+>Use filters to exclude not-needed data. Exclude as much as possible in data flows as they run on Spark Cluster! Performance is much better than in the SQL Server.
 
 **4. Merge Data**
 
 ![](2021-04-09-11-39-34.png)
 
->Only include data from the tables that are included in the facts tables from BW >report FI5000. Again, exclude as much as possible on Spark Cluster.
+>Only include data from the tables contained in the facts tables from BW >report FI5000. Again, exclude as much as possible on Spark Cluster.
 
-**5. Add Dowload date to double check when data was last downloaded**
+**5. Add Download date to double-check when the system last downloaded data**
 
 ![](2021-04-09-11-40-08.png)
 
->Very important to be able to follow through on when the data was downloaded. Check Monitoring Chapter for details
+>Very important to be able to follow through on when the data was downloaded. Check Monitoring Chapter for details.
 
 **6. Insert remaining rows into target SQL Server**
 
 ![](2021-04-09-11-31-52.png)
-Use recreate table to delete and recreate the target tables with each load. Avoid duplicates.
+Use 'recreate table' to delete and recreate the target tables with each load. Avoid duplicates.
 
-**For each table there is a similar dataflow according to above schema**
+**For each table, there is a similar dataflow according to the above schema**
 
 ![](2021-04-09-11-50-13.png)
-
 
 ##Pipelines
 
@@ -587,39 +591,39 @@ Use recreate table to delete and recreate the target tables with each load. Avoi
 
 |  Pipeline | Function  |
 |---|---|
-| PIP_TEST|Dummy used for tests. Not used in weekly run.
+| PIP_TEST|Dummy used for tests. Not used in the weekly run.
 |PIP_O2C_INGEST|Ingest all O2C data to SQL Server
 |PIP_O2C_TRANSFORM|Execute all O2C Transformation in SQL Server
 |PIP_O2C_OUTPUT|Output all O2C data onto SAC Fileserver
-|PIP_O2C_OUTPUT_SCHEMA|Prints first 500 rows of each O2C model to SAC server.Used to speed up model updates in SAC. **Not used in weekly run**
+|PIP_O2C_OUTPUT_SCHEMA|Prints the first 500 rows of each O2C model to the SAC server.Used to speed up model updates in SAC. **Not used in weekly run**
 |PIP_P2P_INGEST|Ingest all P2P data to SQL Server
 |PIP_P2P_TRANSFORM|Execute all P2P Transformation in SQL Server
 |PIP_P2P_OUTPUT|Output all P2P data onto SAC Fileserver
-|PIP_P2P_OUTPUT_SCHEMA|Prints first 500 rows of each P2P model to SAC server. Used to speed up model updates in SAC. **Not used in weekly run**
+|PIP_P2P_OUTPUT_SCHEMA|Prints the first 500 rows of each P2P model to SAC server. Used to speed up model updates in SAC. **Not used in weekly run**
 
 The Pipelines are structured in 3 parts:
-1. Ingest from data lake
+1. Ingest from the data lake
 2. Transformation on the SQL Server
 3. Output to SAC Fileserver
 
 ### Ingest Pipelines
 
-Both Ingest Piepelines work in the same way:
+Both Ingest Pipelines work in the same way:
 
 ![](2021-04-09-11-57-43.png)
 
-**1. Executes Data Dataflows to get SAP Tables from Datalake**
+**1. Executes Data Dataflows to get SAP Tables from Data lake**
 
 ![](2021-04-09-11-58-45.png)
 
-a. Parameters from Dataflows must be entered here. In our case it's the SQL Server table names
+a. Parameters from Dataflows must be entered here. In our case, it's the SQL Server table names
 
->For each dataflow we can variably select the "Run On". If there is a lot of data we can use more CPUs to speed up the processing. This is more expensive though.
+>For each dataflow, we can variably select the "Run On". If there is a lot of data, we can use more CPUs to speed up the processing. The more CPU power we use, the more expensive the processing becomes, though.
 
 **2. Copy Data from BW Cubes**
 ![](2021-04-09-12-02-46.png)
 
-In copy data step you can directly query SQL statements against the denodo baseview of the query. There is now delay in getting the data from BW.
+In the copy data step, you can directly query SQL statements against the Denodo base-view of the query. There is no delay in getting the data from BW.
 
 > You can easily use dynamic parameters in this select statement.
 
@@ -644,58 +648,58 @@ companycode_key_0 = 'EP1_100/0078'
 
 **3. Copy external Excel files**
 
-Excel files can be imported directly fromm the directory in the dataset. You can enter the filename in the settings as parameter.
+Excel files can be imported directly from the directory in the dataset. You can enter the filename in the settings as a parameter.
 
 ![](2021-04-09-13-26-01.png)
 
 
 **4. Special**
 
-The only kind of special case is this SQL server procedure that is executed in the ingest pipeline. It's needed to pre-format the data from BW so that the dataflows can merge the data with the SAP tables.
+The only exception is this SQL server procedure that the pipeline must execute in the ingest pipeline. It's needed to pre-format the data from BW so that the dataflows can merge the data with the SAP tables.
 
 ![](2021-04-09-13-28-49.png)
 
 ### Transformation Pipeline
 
-The Transformation Pipeline is used to execute the stored procedures on the SQL-Server in a procedural manner. More information will be provided in the Chapter about the SQL Server
+The Transformation Pipeline is used to execute the stored procedures on the SQL-Server in a procedural manner. We will provide more information in the Chapter about the SQL Server.
 
 ![](2021-04-09-13-31-58.png)
 
 
 ### Output Pipeline
 
-The output pipelines copy the data from the model tables in SQL server onto the SAC fileserver. It's possible to do another mapping here between SQL Server column name and SAC column name.
+The output pipelines copy the data from the model tables in the SQL server onto the SAC fileserver. It's possible to do another mapping here between SQL Server column name and SAC column name.
 
 ![](2021-04-09-13-35-37.png)
 
 ### Output Pipeline Schema
 
-The model mapping function in SAC is very slow if there is a lot of data uploaded. THis pipeline only print the 500 first rows of each model into the csv file. If there needs to be a new mapping business will ask it to print only the schema to do the mapping. Afterwads the full dataset can be loaded automatically.  
+The model mapping function in SAC is very slow if there is a lot of data uploaded. That is why this pipeline only prints the 500 first rows of each model into the CSV file. If there needs to be a new mapping business will ask IT to print only the schema to do the mapping. Afterward, the full dataset can be loaded automatically.
 
 ## Transport Changes from D-System to P-System
 
 ![](2021-04-15-10-04-14.png)
 
-The data factory is connected to GIT version control. After changes in d-system are done they can be published via the publish button. Afterwards HQ needs to be contacted to move the changes to P-System.
+The data factory has GIT version control. After changes in the d-system are done, they can be published via the publish button. Afterward, HQ needs to be contacted to move the changes to P-System.
 
 #SQL Server
 
 ##Key requirements for transformation stage:
 
-1. The pipeline has to be procedural on each step in the data factory. If one step fails the pipeline must be able to only rerun from the failed activity to avoid long runtimes
+1. The pipeline has to be procedural on each step in the data factory. If one step fails, the pipeline must be able to only rerun from the failed activity to avoid long runtimes
 --> Oil in a Pipeline also does not flow back ;-)
 
-2. Errors should be traceable as easy and fast as possible.
+2. Errors should be traceable as easily and fast as possible.
 
 3. Make solution scalable for future demands
 
 ## Coding rules :
 
 1. Each Stored procedure is only allowed to work with tables of the same name stage or lower:
-E.g. Stored procedure CLN can only work with tables CLN and ING
+E.g., Stored procedure CLN can only work with tables CLN and ING
 TP1 only with CLN/ING/TP1 etc.
-2. Each task for each table in each step gets it’s own stored procedure with the tables name as procedure name.
-e.g. Step to clean table CLN_ADRC is called P_CLN_ADRC
+2. Each task for each table in each step gets its own stored procedure with the table's name as procedure name.
+e.g., Step to clean table CLN_ADRC is called P_CLN_ADRC
 
 3. Strictly follow transformation structure for all tables
 
@@ -707,7 +711,7 @@ e.g. Step to clean table CLN_ADRC is called P_CLN_ADRC
 1. INGESTED from Data Factory 
 Table Names ING_* for SAP&BW / INX_*  for Excel
 
->Original tables from data lake. Should never be changed to avoid having to run INGEST Pipeline again
+>Original tables from the data lake. procedures should never change the data to avoid having to run the INGEST Pipeline again
 
 2. CLEANED  with ETL functions
 Table Names CLN_*
@@ -746,7 +750,7 @@ Create different views that can be consumed via Analytics tools.
 
 ### Scalar Functions and ETL
 
-ETL functions and Scalar functions are named after what they do. They only do one thing. This is especially important because SQL Server does not have a debugger
+ETL functions and Scalar functions are named after what they do. They only do one thing. Having small functions and procedures is especially important because SQL Server does not have efficient debugging capabilities.
 
 
 ### Schema
@@ -757,15 +761,15 @@ ETL functions and Scalar functions are named after what they do. They only do on
 2. o2c
   Everything related to Order to Cash Process
 
->Currently everything in schema dbo is written in upper case. Everything in o2c is written in lower case. This is legacy and should be changed in the future to all lower case. Also, all p2p tables should be moved to a new schema called p2p. Everything that's used for both like ETL functions should be kept in dbo (default schema)
+>Currently, everything in schema dbo is written in the upper case. Everything in o2c is written in lower case. This is a legacy and should be changed in the future to all lower case. Also, all p2p tables should be moved to a new schema called p2p. Everything that's used for both, like ETL functions, should be kept in dbo (default schema)
 
 ### Execution from Datafactory
 
-Not all stored procedures are executed from Azure Cloud. Only the 5 main procedures are controlled via Azure Data Factory:
+Not all stored procedures are executed directly from Azure Cloud. Azure Data Factory only controls the five main procedures:
 
 ![](2021-04-09-13-31-58.png)
 
->This is a trade off between monitoring capability in Data Factory and practicality of use. If every procedure is in ADF, the stored procedure that can be identified directly must be setup and published one by one and adjusted with every change. The *_EXEC Procedures help to structure the procedures while allowing quick changes without changing the overall flow in ADF.
+>This is a trade-off between monitoring capability in Data Factory and practicality of use. If every procedure is in ADF, the stored procedure that can be identified directly must be set up and published one by one and adjusted with every change. The *_EXEC Procedures help structure the procedures while allowing quick changes without changing the overall flow in ADF.
 
 ## CLEANED with ETL functions
 
@@ -821,7 +825,7 @@ exec o2c.p_cln_clean_columns @schema  = 'dbo'
 
 ### p_cln_first
 
-1. Copies all data from ING_* to CLN_*. Creates indexed tables one by one. Adds additional columns.
+1. Copies all data from ING_* to CLN_*, creates indexed tables one by one, and adds additional columns.
 
 ```SQL
 declare @table table
@@ -900,7 +904,7 @@ from o2c.cln_load_details as src
 where table_name = 'BSAD'
 ```
 
->The P2P Method has a longer runtime but makes sure that there can't be any duplicates, even if there would be an error in SAP while the option that was implemented for O2C is faster but in principle could still contain duplicaes if they existed in Source side.
+>The P2P Method has a longer runtime but makes sure that there can't be any duplicates, even if there would be an error in SAP. While the option that was implemented for O2C is faster, it, in principle, could still contain duplicates if they existed on the Source side.
 
 3. Remove Characters that can't be used in CSV File
 
@@ -939,10 +943,10 @@ set @id = @id +1
 end
 ```
 
-The STA_* tables  are later printed as CSV files because SAP Analytics Cloud can currently not work with direct SQL access. Using CSV files has the disadvantage that the characters ',' and '"' can't be used.
+The STA_* tables are later printed as CSV files because SAP Analytics Cloud can currently not work with direct SQL access. Using CSV files has the disadvantage that the characters',' and'"' can't be used.
 
-',': It will cause the csv file to think the next column already starts and therefore mess up the whole file  
-' " ': This character will tell the system to no regards this ',' as a separator which means that if itis at the end of a column can combine two columns and mess up the file.
+', ': It will cause the CSV file to think the next column already starts and therefore mess up the whole file.
+'" ': This character will tell the system to not regard this ',' as a separator which means that if it is at the end of a column can combine two columns and mess up the file.
 
 ### Config ETL Functions
 
@@ -957,7 +961,7 @@ Most ETL functions can be controlled via the config file in Excel.
 - Active: The line is active or not
 - DB Schema: Database Schema for which the function should be executed
 
-Currently there are 3 functions controlled with the config file that are used at several places in the pipeline:
+Currently, there are three procedures controlled with the config file. The ETL procedures is used at several places in the pipeline:
 
 - ADD_ZERO
 - REMOVE_ZERO
@@ -1021,7 +1025,7 @@ end
 
 ### CLN_FI1000
 
-In order to make good use of FI1000 BW Query it must be unpivoted. Currently it ontains one measure for each month of sales. This way it can not be displayed correctly in any BI tool. This routine takes columns for each month and combines them into one column with the values and one date column for the month.
+We must first unpivot the FI1000 BW Query to make good use of it. Currently, it contains one measure for each month of sales. This way, it can not be displayed correctly in any BI tool. This routine takes columns for each month and combines them into one column with the month's values and one date column.
 
 ```SQL
 alter procedure [o2c].[p_cln_fi1000] as
@@ -1161,9 +1165,9 @@ unpivot (
 
 ## Transform 1 and Transform 2
 
-In these stages all Joins are done. The Joins can only access tables that are in CLN stage or CLN and TP1 for Transform 2.
+In these stages, all Joins are done. The Joins can only access tables that are in the CLN stage or CLN and TP1 for Transform 2.
 
-Transform 1 joins tables to Dimensions that can then be resued to join with multiple other FACT tables to the base models. e.g. combines the customer master tables KNA1 and KNB1 to the dimension customer.
+Transform 1 joins tables to Dimensions that can then be reused to join multiple other FACT tables to the base models. e.g., combines the customer master tables KNA1 and KNB1 to the dimension customer.
 
 |  Model | sta_all_items |sta_open_items_monthly|sta_irb_full|sta_irb_monthly|sta_all_cust_items|sta_open_cust_items| sta_eflow_clr|sta_eflow_likp|sta_fi1000|sta_payment_behavior|
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -1177,7 +1181,7 @@ SOURCE|EP1: bsik, bsak, t001,vf_kred,adrc, regup,bkpf <br>EXCEL:overdue_reason, 
 
 ### TP1_EKBE
 
-In the IRB model we watn to find out the invoice quantity and good received quatity for each purchase order and also the last GR posting for the invoice. SAP stores all of this information in table EKBE. However, the document for the good receipt value is in a different line than the invoice receipt. They are linked together with a reference document. The logic below works as follows.
+In the IRB model, we want to determine the invoice quantity and goods received quantity for each purchase order and the last GR posting for the invoice. SAP stores all of this information in table EKBE. However, the document for the goods receipt value is in a different line than the invoice receipt. They are linked together with a reference document. The logic below works as follows.
 
 1. create two helper tables with indexes as the workload can be many million rows
 
@@ -1185,9 +1189,9 @@ In the IRB model we watn to find out the invoice quantity and good received quat
 
 3. join the newest good receipt for the follow on document of each invoice
 
-4. delete duplicates based on PO. This is for the join of IR/GR PO quantity
+4. delete duplicates based on PO for the join of IR/GR PO quantity
 
-5. delete duplicates based on invoice document. This is to later join on IRB material document.
+5. delete duplicates based on the invoice document to later join on IRB material document.
 
 ```SQL
 drop table if exists #ekbe_q
@@ -1424,14 +1428,11 @@ where row_num > 1
 drop table if exists #ekbe_q
 drop table if exists #ekbe_e
 
-
-
-
 ```
 
 ## Transform 3
 
-In this stage all Business Logic is added.
+In this stage, we finally add the business logic.
 
 ### P_TP30_ALL_ITEMS
 
@@ -1457,11 +1458,11 @@ update tp3_all_items set duplicate = 'x' where charindex('v',reference) <> 0
 
 #### Key Date
 
-The Keydate is a very important column as it reflect the day of reporting from financial perspective. Therefore all models contain this field to mark the day of reporting. It's always set as the last day of the last month. e.g. today is 2021-04-05 --> Keydate = 2021-03-31
+The Key date is a critical column as it reflects the day of reporting from the financial perspective. Therefore all models contain this field to mark the day of reporting. It's always set as the last day of the last month. e.g. today is 2021-04-05 --> Key date = 2021-03-31
 
 #### Recalculate Due Date and Arrears after Net
 
-These columns are indicating when an items is due and how many days passed after the due date bzw. how many days until the item will be due. This information is dynamically generated in EP1 and must therefore be recalculated
+These columns indicate when an item is due and how many days passed after the due date, respectively, how many days until the item will be due. This information is dynamically generated in EP1 and must therefore be recalculated
 
 **Recalculate due date based on days1 / days 2**
 
@@ -1550,11 +1551,11 @@ where ir_quantity is null
 
 **Get Business days between two dates**
 
-Some KPI like scan_date_to_input_date can not be calculated excluding business days and weekends. In order to maintain the days that should be excluded there is a column in the Excel Import INX_PAYMENT_CALENDAR that can be used by business to maintain these special days
+We can not calculate some KPI like scan_date_to_input_date excluding business days and weekends without knowing the days to exclude. To maintain the days that we should exclude from the calculation, we use a column in the Excel Import INX_PAYMENT_CALENDAR inside which business maintains these special days.
 
 ![](2021-04-13-14-41-20.png)
 
-This table is then used in a function to calculate the business days between Scandate & Inputdate resp. Inputdate & Posting date
+This table is then used in a function to calculate the business days between Scan date & Input date resp. Input date & Posting date
 
 ```SQL
 
@@ -1584,15 +1585,15 @@ end
 ```
 
 **Convert Currency**
-In SAC there is no real option to recalculate the exchange rate if more than one currency is involved. E.g. CNY --> EUR no problem. HKD or CNY --> EUR = problem
+In SAC, there is no real option to recalculate the exchange rate if more than one currency is involved. E.g. CNY --> EUR no problem. HKD or CNY --> EUR = problem
 
-Therefore the Exchange rate table dbo. currency was created:
+Therefore the Exchange rate table dbo.currency was created:
 
 ![](2021-04-13-14-48-20.png)
 
->In this table the Budget rate in maintained. Currently this is not controlled with Excel as it only changes once a year. Business will create a ticket for IT to manually change it. Currently it's not necessary to use different rates for different time frames.
+>In this table, the Budget rate is maintained. Currently, this is not controlled with Excel because it only changes once a year. Business will create a ticket for IT to change it manually. For now, it's not necessary to use different rates for different periods.
 
-This table is then used in the convert currency function
+This table is then used in the convert currency function.
 
 ```SQL
 alter function [o2c].[fc_convert_currency]
@@ -1759,9 +1760,9 @@ update o2c.tp3_all_cust_items set vat_issued = 'VAT issued' where left(REFERENCE
 update o2c.tp3_all_cust_items set vat_issued = 'no VAT' where left(REFERENCE,3) <> 'INV'
 ```
 
-####Recalculate Due Days based on VAT issue date
+####Recalculate Due Days based on the VAT issue date
 
-similar to the P2P side also for O2C side the due date and Arrears after net must be recalculated. Additionally there is the requirement to calculate the due date based on the VAT due date (Reference_key1 field) This way the Duedate based on Baseline date and Real VAT date can be compared in a report. This requires to also recalculate Days1 and Days2 based on the reference_key_1 and payment term table t052:
+Like the P2P side, for the O2C side, too, the due date and Arrears after net must also be recalculated. Additionally, there is the requirement to calculate the due date based on the VAT due date (Reference_key1 field). This way, we can compare the Due date based on the Baseline date and Real VAT date in a report. To enable this comparison, we need also to recalculate Days1 and Days2 based on the reference_key_1 and payment term table t052:
 
 ![](2021-04-13-15-04-47.png)
 
@@ -1861,15 +1862,15 @@ end
 return @days1
 end
 ```
-> There's another function [o2c].[fc_calculate_days2] that calculates Days2 in a similar way. Unfortunately, there was no easy way to combine the two without increasing the complexity a lot.
+> There's another function [o2c]. [fc_calculate_days2] that similarly calculates Days2. Unfortunately, there was no easy way to combine the two without increasing the complexity a lot.
 
-Based on these newly calculated Days1 and Days2 the duedate and arrears are calculated again. This is similar to the P2P function.
+Based on these newly calculated Days1 and Days2, the due date and arrears are calculated again similar to the P2P function.
 
 #### Include only specific documents for payment behavior calculation
 
-From Business side a lot of documents like warranty, deduction, write offs must be excluded to make the analysis valuable. Therefore the text field must be used to identify the documents:
+Many documents like warranty, deduction, and write-offs must be excluded from Business perspective to make the analysis valuable. Therefore we must use the text field to identify the documents:
 
->The result will be used to aggregate data in STA_PAYMENT_BEHAVIOR
+> We will later use the result to aggregate data in STA_PAYMENT_BEHAVIOR
 
 ```SQL
 update o2c.tp3_all_cust_items set relevant_for_payment_behavior = 'X'
@@ -1905,11 +1906,11 @@ where
 	 and not contains(item_text, '税'))
 ```
 
-   In order to do that a full-text catalog be created:
+   To do that a full-text catalog be created:
 
    ![](2021-04-13-15-19-38.png)
 
-   >As this is a one time step the code is not included in the stored procedures
+   >As this is a one time step, the code is not included in the stored procedures
 
 Afterwards the table can be indexed:
 
@@ -1929,22 +1930,22 @@ ALTER procedure [o2c].[p_tp30_first] as
 
 ## Stage
 
-Based on the full data models, several models are created based on business needs. These tables will later be loaded used to be Loaded into SAC (could be consumed by any other BI tool)
+Based on the full data models, several models are created based on business needs. These tables will later be loaded used to be loaded into SAC (could be consumed by any other BI tool)
 
 
 #### STA_ALL_ITEMS
 
-The ALL_ITEMS Model contains all items that are either open or have been cleared during the last year. The model therefore monthly updates and contains data for one year.
+The ALL_ITEMS Model contains all items that are either open or have been cleared during the last year. The model therefore, updates monthly and contains data for one year.
 
 #### STA_OPEN ITEMS_MONTHLY
 
-The Open items model contains all items that were open at the end of each month for the last year. e.g. all open items on 31.03, 30.04, 31.05 etc.
+The Open items model contains all open items at the end of each month for the last year. e.g., all open items on 31.03, 30.04, 31.05, etc.
 
-This is achieved by calculating back in time on the cleared items column in the TP3_ALL_ITEMS table. If an item is currently open or was cleared after a the given keydate and was posted before the keydate it was open at that time and therefore will be printed into the output model.
+By calculating back in time on the cleared items column in the TP3_ALL_ITEMS table, we can identify which records were open at the key date. If an item is currently open or has been cleared after a given key date and was posted before that keydate, it was open at that time and therefore, will be printed into the output model.
 
-In this model open items can occur multiple times as an item can be open in Jan and Feb and March etc. Therefoe the primary key is the transaction_key and the key_date column.
+In this model open items can occur multiple times as an item can be open in Jan and Feb and March etc. Therefore the primary key is the transaction_key and the key_date column.
 
-After the open items are selected the Arrears after net must be recalculated based on the keydate.
+After the open items are selected, the Arrears after net must be recalculated based on the key date.
 
 ```SQL
 declare @keydate_tp3 date
@@ -2148,21 +2149,21 @@ exec o2c.p_execute_etl_function @imp_function = 'remove_zero', @imp_tablename = 
 
 #### STA_IRB_FULL
 
-This model contains the key_date month + 12 months of prior data
+This model contains the key_date month + 12 months of prior data.
 
 #### STA_IRB_MONTHLY
 
-This is the only model that can not be completely rebuilt with each run. This the model should reflect the last 12 months of parked invoices at the second business day of each month. Unfortunatly the Invoice receipt book has no column to check when the change from parked to posted occured. e.g. in the open items models we can use the clearing date.
+STA_IRB_MONTHLY is the only model that can not be completely rebuilt with each run. The model should reflect the last 12 months of parked invoices on the second business day of each month. Unfortunately, the Invoice receipt book has no column to check when the change from parked to posted occurred. e.g., in the model of the open items, we can use the clearing date.
 
-This means that with every run we have to freeze the first result of each month in this table. Because the state changes afterwards. This causes the following restrictions that are acceptable by local business.
+This means that we have to freeze the first result of each month in this table with every run. Because the state changes afterward, it causes the following restrictions that are acceptable by the local business.
 
 1. Extension of this model with another column can not be done for past data. (unless there is a link)
 
-2. Reporting can never be at the exact 2nd working day of of the new month as the pipeline run is weekly and can not be adjusted with this business logic.
+2. Reporting can never be at the exact 2nd working day of the new month as the pipeline run is weekly and can not be adjusted with this business logic.
 
-3. If there is an error in the weekly run the result might be different for that month
+3. If there is an error in the weekly run, the result might be different for that month
 
-> There is a status table that we already imported to data lake during the project that contains the satus changed for each invoice. ZSI_IR_IC_STATLG. With this table we could calculate back and find the parked status for each invoice. Unfortunately there was not enough time to implement this during the project. This would be up to future developers :)
+> There is a status table that we already imported to data lake during the project that contains the status changed for each invoice. ZSI_IR_IC_STATLG. With this table, we could calculate back and find the parked status for each invoice. Unfortunately, there was not enough time to implement this during the project. To implement this change would be up to future developers :)
 
 ```SQL
 alter procedure [dbo].[p_sta_irb_monthly] as
@@ -2370,15 +2371,15 @@ from
 
 #### STA_ALL_CUST_ITEMS
 
-This model is similar to STA_ALL_ITEMS just for o2c side.
+This model is similar to STA_ALL_ITEMS, just for the o2c side.
 
 #### STA_OPEN_CUST_ITEMS
 
-This model is similar to STA_OPEN_ITEMS_MONTHLY just for o2c side.
+This model is similar to STA_OPEN_ITEMS_MONTHLY just for the o2c side.
 
 #### STA_EFLOW_CLR
 
-THis model contains EFLOW CLR workflow information. To track the KPI on release time
+This model contains EFLOW CLR workflow information. To track the KPI on release time.
 
 
 ```SQL
@@ -2553,12 +2554,12 @@ row_num = 1
 
 #### STA_FI1000
 
-This model provides a usefully pivoted version of the BW FI1000 cube to be used in reporting for DSO and overdue percentages.
+This model provides a usefully pivoted version of the BW FI1000 cube to report DSO and overdue percentages.
 
 
 #### STA_PAYMENT_BEHAVIOR
 
-This special routine takes data from both the STA_OPEN_CUST_ITEMS and STA_ALL_CUST_ITEMS model in order to create a model that can compare overdues and total sales for customers. In order to do this the single open line items are clustered in overdue 30 / 60 / 90+ days and the aggregated for each customer. The Dashboard solution contains a scoring model that then clusteres the customers in good and bad payers.
+This unique routine takes data from both the STA_OPEN_CUST_ITEMS and STA_ALL_CUST_ITEMS model to create a model that can compare overdues and total sales for customers. To do this, the single open line items are clustered in overdue 30 / 60 / 90+ days and aggregated for each customer. The Dashboard solution contains a scoring model that then clusters the customers in good and bad payers.
 
 ```SQL
 alter procedure [o2c].[p_sta_payment_behavior] as
@@ -2672,17 +2673,17 @@ end
 ```
 #### STA_*SCHEMA
 
-Every STA_* table also has a corresponding SCHEMA table. This is necessary for business to speed up the mapping process in SAC.
+Every STA_* table also has a corresponding SCHEMA table for business to speed up the mapping process in SAC.
 
 ## Transport Changes from D-System to P-System
 
 There is no automated transport link between D-SQL and P-SQL. Therefore the changes need to be transported by hand.
 
-> In order to avoid mistakes I would recommend in case of a bigger change to just delete all stored procedures from P-System and Create all D-System Procedures again
+> To avoid mistakes I would recommend in case of a bigger change to delete all stored procedures from P-System and Create all D-System Procedures again
 
 ![](2021-04-15-10-13-13.png)
 
-This can be done with the generate script function in the SQL Server. Tables, procedures and functions can be exported and then be run in the P-System.
+We can do this with the generate script function in the SQL Server. Tables, procedures, and functions can be exported and then be run in the P-System.
 
 # SAP Analytics Cloud
 
@@ -2692,7 +2693,7 @@ This can be done with the generate script function in the SQL Server. Tables, pr
 
 ![](2021-04-14-11-19-27.png)
 
-The STA_* Models are printed into the OUTPUT Folder on the SAC FIle Server.
+The STA_* Models are printed into the OUTPUT Folder on the SAC File Server.
 
 ![](2021-04-14-11-22-03.png)
 
@@ -2700,16 +2701,16 @@ INPUT contains all the Excel information that is imported during the INGEST step
 
 ![](2021-04-14-11-22-57.png)
 
-Excel Upload contains all additional models that are currently based on Excel or extensions to the current models that are joined during the import to SAC
+Excel Upload contains all additional models currently based on Excel or extensions to the current models joined during the import to SAC.
 
 ![](2021-04-14-11-24-10.png)
 
 
 ## SAC Models
 
-All models and stories are saved in this folder owned by Summer.Additional members can be added by contacting her.
+All models and stories are saved in this folder owned by Summer. Additional members can be added by contacting her.
 
-Currenctly the STA_* tables map to the following models:
+Currently, the STA_* tables map to the following models:
 
 | SQL_TABLE  |SAC_MODEL  |
 |---|---|
@@ -2804,23 +2805,23 @@ Credit Management
 
 # Monitoring
 
-With Aure Data Factory it's very easy to keep an overview of all the data pipeline runs in the solution space. You can quickly see which pipelines ran over a period of time and how it was triggered.
+With Azure Data Factory it's straightforward to keep an overview of all the data pipeline runs in the solution space. You can quickly see which pipelines ran over a period of time and how it was triggered.
 
 ![](2021-04-16-11-37-12.png)
 
 ![](2021-04-16-11-37-41.png)
 
-Every pipeline is setup in modular fashion. The monitoring function gives you an easy overview of which modules were running successfully or which one caused the pipeline to stop.
+Every pipeline is set up in a modular fashion. The monitoring function gives you an accessible overview of which modules were running successfully or which one caused the pipeline to stop.
 
 ![](2021-04-16-11-37-59.png)
 
-For data flows it's even possible to see how each action performed and how many rows very processed etc.
+For data flows, it's even possible to see how each action performed and how many rows were processed, etc.
 
 ![](2021-04-16-11-38-32.png)
 
-In case of errors it's very easy to find the root cause as the errors are pretty detailed
+In case of errors, it's easy to find the root cause as the errors are pretty detailed.
 
->For stored procedures the error message of the lowest subroutine is returned making it easy to get to the root cause of the bug.
+>For stored procedures, the error message of the lowest subroutine is returned, making it easy to get to the root cause of the bug.
 
 ![](2021-04-16-11-38-58.png)
 
@@ -2830,7 +2831,7 @@ In case of errors it's very easy to find the root cause as the errors are pretty
 
 ## Data Flow
 
-The pipelines are currently running on a weekly basis through below architeture:
+The pipelines are currently running on a weekly basis through below architecture:
 
 ![](2021-04-14-14-51-08.png)
 
@@ -2843,11 +2844,11 @@ The pipelines are currently running on a weekly basis through below architeture:
 
 ## Flow Date Tracking
 
-### Export data from EP1
+### Export date from EP1
 
-This is the most important data as business needs to know when the SAP data was exported from EP1. Therefore it is tracked through the whole pipeline.
+This is the most important date as business needs to know when we exported the SAP data from EP1. Therefore it is tracked through the whole pipeline.
 
-There is a table called e-dlk-uebersicht-ladedatum which tracks the export time from SAP.
+There is a table called e-dlk-uebersicht-ladedatum tracking the export time from SAP.
 
 ![](2021-04-14-15-01-11.png)
 
@@ -2870,25 +2871,25 @@ from cln_load_details as src
 where table_name = 'bsak'
 ```
 
-In the SAT tables it is then populated finally as src_download_date and loaded into SAC:
+In the SAP tables, it is then populated finally as src_download_date and loaded into SAC:
 
 ![](2021-04-14-15-11-12.png)
 
-### Import data from EP1 and EFLOW to data lake
+### Import data from EP1 and EFLOW to the data lake
 
-This date can be tracked in the table e-dlk-uebersicht-ladedatum too but we don't populate or check it.
+We can track this date in the table e-dlk-uebersicht-ladedatum, too, but we don't populate or check it.
 
 ### Running Pipeline in Data Factory
 
-Every Flow populates the download date as a last step:
+Every Data Flow populates the download date as the last step:
 
 ![](2021-04-14-15-14-13.png)
 
-For BW reports it is added in the copy data step:
+For BW reports, the download date is added in the copy data step:
 
 ![](2021-04-14-15-17-30.png)
 
-This way we can check in SQL server when the data in the table was last downloaded:
+This way, we can check in the SQL server when we last downloaded the data in the table:
 
 ![](2021-04-14-15-15-20.png)
 
@@ -2898,21 +2899,21 @@ It is then populated along with the src_download date and can be found in SAC to
 
 ### Importing data to SAC
 
-For every Model an import job from the file server is setup weekly:
+For every Model, an import job from the file server is set up weekly:
 
 ![](2021-04-14-15-25-58.png)
 
-The job can be refreshed manually as well by hitting the Refresh button. THe scheduling can be changed by clicking the calendar button.  
+The job can be refreshed manually as well by hitting the Refresh button. We can change the scheduling by clicking the calendar button.  
 
-On the right side the last imports are displayed. If there are two files merged it is also showing here:
+On the right side, the last imports are displayed. If there are two files merged, it is also showing here:
 
 ![](2021-04-14-14-23-52.png)
 
-In this case the OPEN ITEMS NEW AR MODEL is containing the main file (STA_OPEN_CUST_ITEMS) and an additional file from the Excel Upload folder:
+In this case, the OPEN ITEMS NEW AR MODEL contains the main file (STA_OPEN_CUST_ITEMS) and an additional file from the Excel Upload folder:
 
 ![](2021-04-14-14-25-40.png)
 
-The mapping of the model from the basefile can be checked here:
+We can check the mapping of the model from the base file here:
 
 ![](2021-04-14-14-29-05.png)
 
@@ -2920,23 +2921,23 @@ Additional calculations that are done in the model can be checked here as well. 
 
 ## Compare Q-D System
 
-Changes should be implemented in the test system first and then transported to the P-System. We need a way to quickly track how after the change the row counts in the SQL Server changed to verify if the development is successful.
+Changes should be implemented in the test system first and then transported to the P-System. We need a way to quickly track how the row counts in the SQL Server changed to verify if the development is successful after the change.
 
-In order to do this the metadata (columncount and rowcount) for each table is written down in another table called metadata:
+To do this, the metadata (column count and row count) for each table is written down in another table called metadata:
 
 ![](2021-04-14-15-31-53.png)
 
 ![](2021-04-14-15-33-40.png)
 
-As the d-system and p-system are completely different SQL Servers it's not easy to compare the metadata tables from Q and P-System directly. We built a small Power BI Dashboard that can automatically pull data from both Q and P for comparison:
+Because the d-system and p-system are completely different SQL Servers, it's not easy to directly compare the metadata tables from Q and P-System. We built a small Power BI Dashboard that can automatically pull data from both Q and P for comparison:
 
 ![](2021-04-14-15-36-01.png)
 
-This way it's easy to double check how wether the change had unwanted impact on other tables.
+This way, it's easy to double-check whether the change had an unwanted impact on other tables.
 
 ## Pipeline runs
 
-The overall pipeline runs can easily be tracked in
+we can easily track in the overall pipeline runs
 
 # Frequent Questions / Issues / Requests
 
@@ -2944,23 +2945,23 @@ The overall pipeline runs can easily be tracked in
 
 ### We (Business) want to add a new column to model X
 
-There are 3 options to do this:
+There are three options to do this:
 
 1. Create a new SAC Model and Link the data in the story
 	![](2021-04-15-09-40-09.png)
 
 	++ Business can create the model and link themselves
-	++ Can link data from another context (e.g. Actual model and Target model)
+	++ Can link data from another context (e.g., Actual model and Target model)
 
 	-- Functionality for calculations limited
 	-- Clunky /Strange errors sometimes
-	-- Business has to manually maintain the data
+	-- Business has to maintain the data manually
 	<br>
 2. Add the data in the SAC Model via the Upload Excel folder on the SAC Fileserver
 
 	![](2021-04-15-09-44-36.png)
 
-2.1 Business needs to add new column to model.
+2.1 Business needs to add a new column to model.
 
 ![](2021-04-15-09-57-40.png)
 
@@ -2970,34 +2971,34 @@ There are 3 options to do this:
 
 2.3 Business will import the data and do a new mapping for the changed import file
 
-2.4 Run the OUTPUT pipeline to print the full data model to the SAC Fileserver
+2.4 Run the OUTPUT pipeline to print the entire data model to the SAC Fileserver
 
-2.5 Business now imports the full data and double checks the change
+2.5 Business now imports the entire data and double checks the change
 
 	++ Business can do the change themselves
 	++ Has full functionality of SAC later on
 
-	-- More conplexity in the model
+	-- More complexity in the model
 	-- Business has to maintain data manually
 
 3. Add the column into SQL Server
-> I would always recommend to do option 1 or 2 first as a blueprint until the business case is clear and then automate on the SQL server afterwards. This avoids a lot of friction between IT and Business.
+> I would always recommend doing option 1 or 2 first as a blueprint until the business case is clear and then automate on the SQL server afterward, avoiding much friction between IT and Business.
 
 3.1 check with business where the information is stored and then start from there.
-If the information is not on data lake yet we need to request it from HQ first and schedule it to be loaded.
+If the information is not on data lake yet, we need to request it from HQ first and schedule it to be loaded.
 
-3.2 After this is done or if it is already available the ingest pipeline must be adjusted e.g.
+3.2 After this is done or if it is already available, the ingest pipeline must be adjusted e.g.
 
 ![](2021-04-15-09-52-27.png)
 
-Here we are adding a new column from BKPF table to be downloaded to SQL Server
+Here we are adding a new column from the BKPF table to be downloaded to SQL Server
 
-3.3 Add new column in the SQL tables of D-SQL-Server
-Some tables are generated automatically here we don't need to add additional columns. Some tables need to be created statically like the STA_* tables and indexed tables. Here we need to add the coding.
+3.3 Add a new column in the SQL tables of D-SQL-Server
+Some tables are generated automatically here. We don't need to add additional columns. Some tables need to be created statically, like the STA_* tables and indexed tables. Here we need to add the coding.
 
-> Best way is to run the pipeline and see where it is interrupted and then add the coding there. For STA_* tables we always need to add the new column manually as this will change the output to SAP and requires new mapping by business
+> Best way is to run the pipeline, see where it is interrupted, and then add the coding. For STA_* tables, we always need to add the new column manually as this will change the output to SAP and requires new mapping by business.
 
-3.4 Business needs to add new column to model.
+3.4 Business needs to add a new column to model.
 
 ![](2021-04-15-09-57-40.png)
 
@@ -3007,9 +3008,9 @@ Some tables are generated automatically here we don't need to add additional col
 
 3.6 Business will import the data and do a new mapping for the changed import file
 
-3.7 Run the OUTPUT pipeline to print the full data model to the SAC Fileserver
+3.7 Run the OUTPUT pipeline to print the whole data model to the SAC Fileserver
 
-3.8 Business now imports the full data and double checks the change
+3.8 Business now imports the entire data and double checks the change
 
 3.9 Transfer the coding to P-System. Check the chapters for transports above.
 
@@ -3020,18 +3021,18 @@ Some tables are generated automatically here we don't need to add additional col
 
 ### Add new BW cube to Solution Space
 
-As described previously it's advisable to ask business to first do a check by downloading the BW report to Excel and build a dashboard to understand their requirements by themselves. (type1 change)
+As described previously, it's advisable to ask business to first do a check by downloading the BW report to Excel and build a dashboard to understand their requirements by themselves. (type1 change)
 
-Once the requirements are clarified we can continue with initiation the type2 change.
+Once the requirements are clarified, we can continue with the initiation of the type2 change.
 
-In that case a Denodo base view has to be created by HQ. This can be done by contacting Mandeep Kaur.
+In that case, a Denodo base view has to be created by HQ. This can be done by contacting Mandeep Kaur.
 
 # Issues
-## We (Business) want to add a new calculated dimension but in SAC we get the following error
+## We (Business) want to add a new calculated dimension, but in SAC, we get the following error
 
 ![](2021-04-15-10-18-39.png)
 
-SAC seems to have problems if the calculated dimensions are created on dimensions with a lot of different member values. e.g. this error will appear when creating calculated dimensions on the text column as every row has a different value in the field. It will most likely not appear for a calculated dimension on the company code as there are only 10 differnt members.
+SAC seems to have problems if the calculated dimensions are created on dimensions with many different member values. e.g., this error will appear when creating calculated dimensions on the text column as every row has a different value in the field. It will most likely not appear for a calculated dimension on the company code as there are only ten different members.
 
 There are two options to solve this.
 
@@ -3040,15 +3041,15 @@ There are two options to solve this.
 ![](2021-04-15-10-25-34.png)
 
 
-1.1 Business needs to add new column to model.
+1.1 Business needs to add a new column to the model.
 
 1.2 Run the SCHEMA pipeline to print only the first 500 rows of the model
 
 1.3 Business will import the data and add the new calculation
 
-1.4 Run the OUTPUT pipeline to print the full data model to the SAC Fileserver
+1.4 Run the OUTPUT pipeline to print the entire data model to the SAC Fileserver
 
-1.5 Business now imports the full data and double checks the change
+1.5 Business now imports the entire data and double checks the change
 
 ++ Change can be done by business themselves
 -- Increases complexity of the model
@@ -3068,19 +3069,19 @@ update o2c.tp3_all_cust_items set vat_issued = 'VAT issued' where left(REFERENCE
 ++ can fulfill all business requirements
 -- IT effort
 
-> Again it makes sense to do option 1 first and then move all the additonal calculations to the SQL server once there are a couple of them accumulated in the SAC model (type1 change first)
+> Again, it makes sense to do option one first and then move all the additional calculations to the SQL server once there are a couple of them accumulated in the SAC model (type1 change first)
 
 
 ## Business thinks that the data is wrong
 
-At the start of the implementation phase this seemed to almost always be correct. With great help of our key users we were able to find many bugs during testing phase.
+At the start of the implementation phase, this seemed almost always to be correct. With the great help of our key users, we were able to find many bugs during the testing phase.
 
-During the end of the project however, in almost all cases the error was not in the solution but in the Excel comparison.
+At the end of the project, however, the error was not in the solution in almost all cases but in the Excel comparison.
 
-In case business reports that the data is wrong we can have a quick check as follows:
+In case business reports that the data is wrong, we can have a quick check as follows:
 
-1. Ask for a sample set that should be included but is not / or is excluded but should be not
+1. Ask for a sample set with rows that should be included but are not / or excluded but should be included.
 
-2. Check back into through STA / TP3 / TP2 / TP1 / CLN / ING tables to find the root cause.
+2. Traceback into STA / TP3 / TP2 / TP1 / CLN / ING tables to find the root cause.
 
-3. If a calculation like 'arrears after net' is wrong check directly in EP1 system.
+3. If a calculation like 'arrears after net' is wrong, check directly in the EP1 system.
