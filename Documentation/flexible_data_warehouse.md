@@ -146,11 +146,11 @@ Especially if you're an IT guy like me, this is a MUST read. Because we are fasc
 
 The chapter shines a light on how business sees things.
 
-##Chapter2:
+## Chapter2:
 
 This chapter builds on top of the first, discusses the necessity of a different approach for the agile KPI layer, and presents a working solution for its implementation. The chapter highlights the chosen architecture and outlines the benefits of the classic data warehouse and operational reporting.
 
-##Chapter3:
+## Chapter3:
 
 This chapter is proof that this document is not just a consulting company slide-(shit)-show.
 
@@ -160,7 +160,7 @@ The coding samples do not include all coding but only the building blocks to exp
 
 <div style="page-break-after: always;"></div>
 
-#Chapter1: The Framework for Business Process Improvement
+# Chapter1: The Framework for Business Process Improvement
 
 ## The dashboard that shows just numbers misses the point.
 
@@ -177,7 +177,7 @@ It’s the Controller’s job to take and prepare presentations that point out t
 In contrast, it seems useful that a Controller uses BI tools to make sense of the data before preparing a C-level presentation. With augmented analytics, a machine might do this prioritization of abnormal data in the future. However, the future is not now. At least not in your average industrial company.
 
 Actually, the topic is quite big and deserves a separate post. For this article’s sake, let’s agree that the middle manager is the main target for Self Service BI tools.
-##The main job of the middle manager is process optimization.
+## The main job of the middle manager is process optimization.
 Process optimization is a multi-step process. Depending on your source, the number of steps and their names might vary. Generally speaking, it’s the following:
 
 1. Identify that there is a problem
@@ -198,13 +198,13 @@ From looking at the questions above, you can already tell that the dashboard des
 
 Let’s have a look at how a more sophisticated solution could answer these questions. I took the screenshots from one of the actual dashboards we implemented at my company. To make it readable at this page layout, I included only the essential parts (lego bricks) of each dashboard part to get the point across. The numbers are anonymized.
 
-##IDENTIFY / Is There a Problem?
+## IDENTIFY / Is There a Problem?
 
 ![2021-04-15-14-01-22](/assets/2021-04-15-14-01-22.png)
 
 In this screenshot, you can see the classic dashboard that usually gets printed on marketing materials. The actual numbers of last period’s KPI were placed on the left. Below you can see the trend over the previous months. If the KPI crosses a certain threshold, it turns green/red to indicate whether the result got better or worse than last month. For each KPI, you can jump to the root cause analysis by double-clicking.
 
-##ANALYZE / What Caused the Problem?
+## ANALYZE / What Caused the Problem?
 The main idea is that a bad result is, in most cases, not caused by the average. Most of the time, outliers drag down the overall result. Consequently, showing a top-level KPI without quickly allowing for root cause analysis leads to ineffective actions as the vast majority of dimension members is not a problem. Problems often cluster around a particular attribute of a dimension that all members have in common.
 
 For example, Suppliers based in Hong Kong perform worse than suppliers from other countries. It’s easy to then drill down into suppliers from Hong Kong.
@@ -213,7 +213,7 @@ For example, Suppliers based in Hong Kong perform worse than suppliers from othe
 
 By spreading out the KPI along critical dimensions and attributes, the manager can quickly narrow down the possible causes.
 
-##ACT / Which Actions Should We Take?
+## ACT / Which Actions Should We Take?
 As the time available to the team for making improvements is limited, it’s essential to prioritize effective actions. To find the most effective actions, we need to first think about which actions the manager can take and which dimensions will be influenced. Most of the time, it turns out to be not that many, so it’s even more important to know them. Examples might be his direct reports, specific system settings, and vendors or customers.
 
 In the analysis section, we already discussed the importance of outliers. Outliers are exponentially more beneficial to work on as the same action is usually required to improve both an outlier and an average member, while the potential increase of the overall KPI is much greater with the outlier.
@@ -233,7 +233,7 @@ Assuming we have time to work on the top 3 customers each month, we can now simu
 Confidentiality and customer choice can be adjusted without additional effort, which allows the manager to simulate possible actions, formulate the best measures, and set a realistic target for the next period.
 
 Including the managers’ expert business knowledge in this step is essential as specific customers will have more or less business in the future, or some customers might be harder to handle than others.
-##CHECK / Were the actions successful?
+## CHECK / Were the actions successful?
 
 ![0_DKj1SIly3oY2wjKi](/assets/0_DKj1SIly3oY2wjKi.jfif)
 
@@ -253,12 +253,12 @@ Similarly, the dashboard's value can be judged by the value difference between t
 
 However, it’s essential to understand that the actions taken and not the dashboard itself are responsible for the improvement.
 
-##How to improve even more!
+## How to improve even more!
 As there is no perfect solution, there is one feature missing I would hope SAP would implement in the future:
 All actions coming from the insights must be captured and followed up outside the tool. I would love to see integrated task management or direct integration to a tool like Trello that helps create and follow up on tasks derived from insights.
 <div style="page-break-after: always;"></div>
 
-#Chapter2: Designing an IT system to support Business Process Improvement optimally
+# Chapter2: Designing an IT system to support Business Process Improvement optimally
 
 ## Current System Landscape and its Users
 
@@ -266,7 +266,7 @@ All actions coming from the insights must be captured and followed up outside th
 
 The image above shows in a very simple way the user groups that consume reporting (y) and the frequency reporting is needed by them (x). Each group and frequency has different requirements on relevant information and the way to consume it.
 
-###Operational Reporting:
+### Operational Reporting:
 Operational reporting is the reporting layer used by specialists on a day-to-day basis to verify the daily operations and smoothness of processes in the systems. Questions that a reporting system in this layer needs to answer are, e.g.:
 
 1. Were all invoices posted?
@@ -282,7 +282,7 @@ Summary Operational Reporting:
 - Easy
 - Source System capability
 
-###Core KPI Layer
+### Core KPI Layer
 
 The Core KPI Layer (yellow) contains the top KPIs that are necessary to run the company. These KPIs are crucial and must be comparable over long periods. Decisions made at this level are strategic and take time to show their impact on the actual data.
 
@@ -298,7 +298,7 @@ Summary Core KPI Layer:
 - Huge Volumes of Data
 - Business Warehouse system and Controllers job
 
-###Agile KPI Layer
+### Agile KPI Layer
 
 The Agile KPI Layer(green) contains all the error analysis, reporting, and nitty-gritty that the middle manager needs to run the business under his responsibility. The insights that a middle manager wants to derive from data are more in the short term but need to be more flexible than top management requirements, and data volumes needed are smaller but need to be more detailed.
 
@@ -425,11 +425,11 @@ The trade-off, in that case, is less manual work and higher stability for accura
 In the flexible warehouse, we are very willing to make this trade-off. For the core KPI layer, it might be a different discussion.
 <div style="page-break-after: always;"></div>
 
-#Chapter3: Implementation of the flexible data Warehouse
+# Chapter3: Implementation of the flexible data Warehouse
 
-##Systems
+## Systems
 
-###Data Factory
+### Data Factory
 
 D-System:
 https://adf.azure.com/en-us/authoring/dataflow/O2C_INGEST_ACCOUNTS_RECEIVEABLES?factory=%2Fsubscriptions%2F770faa00-73c9-4505-be0e-9fd399518c7f%2FresourceGroups%2Fsdp-s-fssc%2Fproviders%2FMicrosoft.DataFactory%2Ffactories%2Fsdp-s-d-fssc-df
